@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:nasa_apod/screens/about_screen.dart';
 import 'package:nasa_apod/screens/detail_screen.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:provider/provider.dart';
@@ -47,15 +48,8 @@ class MainApp extends StatelessWidget {
         AppScaffold.routeName: (context) => AppScaffold(),
         DetailScreen.routeName: (context) => DetailScreen(),
         MediaScreen.routeName: (context) => MediaScreen(),
+        AboutScreen.routeName: (context) => AboutScreen(),
       },
     );
-  }
-}
-
-// FIX: Network Image HttpException - NOT WORKING
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext context) {
-    return super.createHttpClient(context)..maxConnectionsPerHost = 5;
   }
 }

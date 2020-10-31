@@ -113,18 +113,10 @@ class _VideoPlayButton extends StatelessWidget {
 
   _VideoPlayButton({@required this.url});
 
-  void _launchUrl(BuildContext context) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      showSnackbar(context, 'Cannot open link: $url');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      onPressed: () => _launchUrl(context),
+      onPressed: () => launchUrl(context, url),
       child: Icon(
         Icons.play_arrow,
         color: Colors.white,
@@ -136,5 +128,13 @@ class _VideoPlayButton extends StatelessWidget {
       color: appTheme.colorScheme.error,
       elevation: 6.0,
     );
+  }
+}
+
+void launchUrl(BuildContext context, String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    showSnackbar(context, 'Cannot open link: $url');
   }
 }

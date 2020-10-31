@@ -89,6 +89,24 @@ class _AppScaffoldState extends State<AppScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Side-bar Navigation
+      drawer: Drawer(
+          child: ListView(
+        children: [
+          DrawerHeader(
+            child: Text("NASA's Astronomy Picture of the Day"),
+          ),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text('About'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/about');
+            },
+          ),
+        ],
+      )),
+
       // App Bar
       appBar: AppBar(
         title: Text("NASA's APoD"),
