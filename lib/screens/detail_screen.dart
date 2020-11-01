@@ -6,6 +6,7 @@ import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
 import 'package:provider/provider.dart';
+// import 'package:http/http.dart' as http;
 
 class DetailScreen extends StatelessWidget {
   static const String routeName = '/detail';
@@ -284,3 +285,22 @@ class MediaScreen extends StatelessWidget {
     );
   }
 }
+
+// class ShareButton extends StatelessWidget {
+//   final String mediaType;
+//   final String imageUrl;
+
+//   ShareButton({@required this.mediaType, @required this.imageUrl});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return IconButton(
+//       icon: Icon(Icons.share),
+//       onPressed: () {},
+//     );
+//   }
+
+//   void shareImage() async {
+//     var response = await http.get(imageUrl)
+//   }
+// }

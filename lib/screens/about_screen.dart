@@ -15,7 +15,7 @@ class AboutScreen extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          icon: Icon(Icons.ac_unit),
+          icon: Image.asset('images/icons/github.png'),
           onPressed: () => launchUrl(context, githubUrl),
         ),
         IconButton(
@@ -51,7 +51,10 @@ class AboutScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text('Powered with Flutter ', style: footerStyle),
-        Icon(Icons.ac_unit),
+        Image.asset(
+          'images/icons/flutter.png',
+          height: footerStyle.fontSize,
+        )
       ],
     );
 
@@ -69,10 +72,24 @@ class AboutScreen extends StatelessWidget {
       style: appTheme.textTheme.subtitle1,
       textAlign: TextAlign.center,
     );
-    final Widget appDeveloper = Text(
-      "Developed by Christian Kyle Ching",
-      style: appTheme.textTheme.subtitle2,
-      textAlign: TextAlign.center,
+    final Widget appDeveloper = Column(
+      children: [
+        Text(
+          "Developed by",
+          style: appTheme.textTheme.subtitle2.copyWith(
+            fontWeight: FontWeight.normal,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 4),
+        Text(
+          "Christian Kyle Ching",
+          style: appTheme.textTheme.subtitle1.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
 
     return Scaffold(
@@ -96,7 +113,6 @@ class AboutScreen extends StatelessWidget {
                     appDescription,
                     SizedBox(height: 32),
                     appDeveloper,
-                    SizedBox(height: 8),
                     appDeveloperLinks(context),
                   ],
                 ),
