@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/screens/about_screen.dart';
@@ -16,26 +15,8 @@ void main() {
   // DEBUG: Generate random data
   // generateMockData();
 
-  // FIX: Network Image HttpException
-  // HttpOverrides.global = MyHttpOverrides();
-
   runApp(ChangeNotifierProvider(
       create: (context) => ApodModel(), child: MainApp()));
-}
-
-// DEBUG: Generate mock values
-void generateMockData() {
-  DateTime _now = DateTime.now();
-  List<String> mockDates = List.generate(
-      10,
-      (index) => (DateTime(_now.year, _now.month, _now.day)
-          .subtract(Duration(days: index * 2))
-          .toIso8601String()));
-
-  AppData mockAppData = AppData(favoriteDates: mockDates);
-  // ignore: invalid_use_of_visible_for_testing_member
-  SharedPreferences.setMockInitialValues(
-      {AppStorage.KEY: jsonEncode(mockAppData)});
 }
 
 class MainApp extends StatelessWidget {
@@ -52,4 +33,19 @@ class MainApp extends StatelessWidget {
       },
     );
   }
+}
+
+// DEBUG: Generate mock values
+void generateMockData() {
+  DateTime _now = DateTime.now();
+  List<String> mockDates = List.generate(
+      10,
+      (index) => (DateTime(_now.year, _now.month, _now.day)
+          .subtract(Duration(days: index * 2))
+          .toIso8601String()));
+
+  AppData mockAppData = AppData(favoriteDates: mockDates);
+  // ignore: invalid_use_of_visible_for_testing_member
+  SharedPreferences.setMockInitialValues(
+      {AppStorage.KEY: jsonEncode(mockAppData)});
 }

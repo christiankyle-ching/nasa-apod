@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/app_storage.dart';
 
+enum MediaType { image, video }
+
 // Base Apod Class
 class Apod {
   final String copyright;
@@ -13,7 +15,7 @@ class Apod {
   final String explanation;
   final String hdurl;
   final String url;
-  final String mediaType;
+  final MediaType mediaType;
   final String serviceVersion;
   final String title;
 
@@ -39,7 +41,8 @@ class Apod {
       explanation: json['explanation'],
       hdurl: httpUrlHd,
       url: httpUrl,
-      mediaType: json['media_type'],
+      mediaType:
+          (json['media_type'] == 'image') ? MediaType.image : MediaType.video,
       serviceVersion: json['service_version'],
       title: json['title'],
     );

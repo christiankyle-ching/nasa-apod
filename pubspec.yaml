@@ -38,6 +38,7 @@ dependencies:
   shared_preferences: ^0.5.12
   url_launcher: ^5.7.5
   share: '>=0.6.5+4 <2.0.0'
+  path_provider: 1.6.22
 
 dev_dependencies:
   flutter_test:

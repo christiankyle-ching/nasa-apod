@@ -23,27 +23,19 @@ class ApodListView extends StatefulWidget {
 class _ApodListViewState extends State<ApodListView> {
   ScrollController _scrollController;
 
-  List<Apod> _listApods;
-  ApodModel _apodModel;
-
   @override
   void initState() {
     super.initState();
 
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-
-    _apodModel = Provider.of<ApodModel>(context, listen: false);
-    _listApods = (widget.willLoadFavorites)
-        ? _apodModel.favoriteApods
-        : _apodModel.listOfApods;
   }
 
   void _startLoading() {
     String message = (widget.willLoadFavorites)
         ? 'Loading your favorites. Please wait...'
         : 'Loading next ${ApodApi.itemPerPage} photos. Please wait...';
-    showSnackbar(context, message);
+    showSnackbar(context, message, duration: 1000);
   }
 
   void _endLoading() {
@@ -105,20 +97,20 @@ class _ApodListViewState extends State<ApodListView> {
   }
 
   Widget _buildInfiniteList(BuildContext context) {
-    if (_listApods.length <= 0) {
-      _startLoading();
-      try {
-        _apodModel.fetchNextApods().catchError((Object error) {
-          showNoInternetError(context);
-        }).whenComplete(() => _endLoading());
-        return Container();
-      } catch (error) {
-        showSnackbar(context, 'Unknown error occured: $error');
-      }
-    }
-
     return Consumer<ApodModel>(
       builder: (_, apodModel, __) {
+        if (apodModel.listOfApods.length <= 0) {
+          _startLoading();
+          try {
+            apodModel.fetchNextApods().catchError((Object error) {
+              showNoInternetError(context);
+            }).whenComplete(() => _endLoading());
+            // return Container();
+          } catch (error) {
+            showSnackbar(context, 'Unknown error occured: $error');
+          }
+        }
+
         return ListView.builder(
             controller: _scrollController,
             itemCount: apodModel.listOfApods.length,

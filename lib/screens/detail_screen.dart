@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-// import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http;
+import 'package:share/share.dart';
 
 class DetailScreen extends StatelessWidget {
   static const String routeName = '/detail';
@@ -28,7 +30,13 @@ class DetailScreen extends StatelessWidget {
         actions: [
           FavoriteToggle(
             apod: apod,
-          )
+          ),
+          ShareButton(
+            date: apod.date,
+            mediaType: apod.mediaType,
+            mediaUrl: apod.url,
+            title: apod.title,
+          ),
         ],
       ),
       body: ApodDetail(apod: apod),
@@ -199,6 +207,13 @@ class ApodDetail extends StatelessWidget {
                       ),
                     ),
                     if (noScaffold) FavoriteToggle(apod: apod),
+                    if (noScaffold)
+                      ShareButton(
+                        date: apod.date,
+                        mediaType: apod.mediaType,
+                        mediaUrl: apod.url,
+                        title: apod.title,
+                      ),
                   ],
                 ),
 
@@ -286,21 +301,83 @@ class MediaScreen extends StatelessWidget {
   }
 }
 
-// class ShareButton extends StatelessWidget {
-//   final String mediaType;
-//   final String imageUrl;
+class ShareButton extends StatefulWidget {
+  final MediaType mediaType;
+  final String mediaUrl;
+  final String title;
+  final DateTime date;
 
-//   ShareButton({@required this.mediaType, @required this.imageUrl});
+  ShareButton({
+    @required this.mediaType,
+    @required this.mediaUrl,
+    @required this.title,
+    @required this.date,
+  });
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return IconButton(
-//       icon: Icon(Icons.share),
-//       onPressed: () {},
-//     );
-//   }
+  @override
+  _ShareButtonState createState() => _ShareButtonState();
+}
 
-//   void shareImage() async {
-//     var response = await http.get(imageUrl)
-//   }
-// }
+class _ShareButtonState extends State<ShareButton> {
+  bool _isLoading;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLoading = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: (_isLoading)
+          ? SizedBox(
+              child: CircularProgressIndicator(),
+              height: 20,
+              width: 20,
+            )
+          : Icon(Icons.share),
+      onPressed: () =>
+          (widget.mediaType == MediaType.image) ? _shareImage() : _shareVideo(),
+    );
+  }
+
+  void _shareImage() async {
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+      // Fetch Image
+      http.Response response = await http.get(widget.mediaUrl);
+
+      // Get Application path
+      final String directory = (await getApplicationDocumentsDirectory()).path;
+      final String fileDir = '$directory/apod_share.png';
+
+      // Create new file, then write as bytes
+      File imageFile = new File(fileDir);
+      imageFile.writeAsBytesSync(response.bodyBytes);
+
+      Share.shareFiles(
+        [fileDir],
+        subject: "NASA's Photo of the Day",
+        text: "Check out this photo of ${widget.title} taken on ${widget.date}",
+      );
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _shareVideo() async {
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+      Share.share(this.widget.mediaUrl, subject: "NASA's Photo of the Day");
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+}

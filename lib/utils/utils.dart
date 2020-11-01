@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -53,10 +54,18 @@ bool isDateWithinRange(DateTimeRange range, DateTime date) {
 }
 
 // Widgets
-Widget buildMediaPreview(BuildContext context, String mediaType, String url) {
-  return mediaType == 'image'
-      ? _ImagePreview(url: url)
-      : _VideoPreview(url: url);
+Widget buildMediaPreview(
+    BuildContext context, MediaType mediaType, String url) {
+  switch (mediaType) {
+    case MediaType.image:
+      return _ImagePreview(url: url);
+      break;
+    case MediaType.video:
+      return _VideoPreview(url: url);
+      break;
+    default:
+      return Container();
+  }
 }
 
 class _ImagePreview extends StatelessWidget {
