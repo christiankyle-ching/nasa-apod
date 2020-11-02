@@ -56,8 +56,9 @@ class _ApodListViewState extends State<ApodListView> {
         return showNoInternetError(context);
       } catch (error) {
         showSnackbar(context, 'Unknown error occured: $error');
+      } finally {
+        _endLoading();
       }
-      _endLoading();
     }
   }
 
@@ -102,12 +103,11 @@ class _ApodListViewState extends State<ApodListView> {
         if (apodModel.listOfApods.length <= 0) {
           _startLoading();
           try {
-            apodModel.fetchNextApods().catchError((Object error) {
-              showNoInternetError(context);
-            }).whenComplete(() => _endLoading());
-            // return Container();
+            apodModel.fetchNextApods();
           } catch (error) {
             showSnackbar(context, 'Unknown error occured: $error');
+          } finally {
+            _endLoading();
           }
         }
 

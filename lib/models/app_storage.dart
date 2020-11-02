@@ -1,7 +1,9 @@
 // Encodes/Decodes AppData to for preparation for AppStorage
 import 'dart:convert';
 
+import 'package:nasa_apod/tasks/wallpaper_task.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:workmanager/workmanager.dart';
 
 class AppData {
   List<String> favoriteDates;
@@ -36,23 +38,40 @@ Connection to Persistent Storage - SharedPreferences
 Saves object of type AppData
 */
 class AppStorage {
-  static const KEY = 'nasa_apod';
+  static const FAVORITES_KEY = 'favorites';
+  static const _ENABLE_DYNAMIC_WALLPAPER = 'enableDynamicWallpaper';
 
-  Future<AppData> getData() async {
+  Future<AppData> getFavorites() async {
     final prefs = await SharedPreferences.getInstance();
 
     AppData blankAppData = AppData(favoriteDates: []);
     String blankAppDataStr = jsonEncode(blankAppData);
 
     // return AppData from SharedPreferences<Json>
-    return AppData.fromJson(
-        jsonDecode(prefs.getString(AppStorage.KEY) ?? blankAppDataStr));
+    return AppData.fromJson(jsonDecode(
+        prefs.getString(AppStorage.FAVORITES_KEY) ?? blankAppDataStr));
   }
 
-  void saveData(AppData appData) async {
+  void saveFavorites(AppData appData) async {
     final prefs = await SharedPreferences.getInstance();
 
     // Set AppData value encoded to String<Json> to SharedPreferences
-    prefs.setString(AppStorage.KEY, jsonEncode(appData));
+    prefs.setString(AppStorage.FAVORITES_KEY, jsonEncode(appData));
+  }
+
+  static Future<bool> getDynamicWallpaper() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return prefs.getBool(AppStorage._ENABLE_DYNAMIC_WALLPAPER) ?? false;
+  }
+
+  static void setDynamicWallpaper(bool newValue) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    prefs.setBool(AppStorage._ENABLE_DYNAMIC_WALLPAPER, newValue);
+
+    print('Dynamic Wallpaper: $newValue');
+
+    updateWorkManager(newValue);
   }
 }

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/screens/about_screen.dart';
 import 'package:nasa_apod/screens/detail_screen.dart';
+import 'package:nasa_apod/tasks/notifications.dart';
+import 'package:nasa_apod/tasks/wallpaper_task.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +16,12 @@ import 'screens/home_screen.dart';
 void main() {
   // DEBUG: Generate random data
   // generateMockData();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  initializeWallpaperTask();
+
+  initializeNotifications();
 
   runApp(ChangeNotifierProvider(
       create: (context) => ApodModel(), child: MainApp()));
@@ -47,5 +55,5 @@ void generateMockData() {
   AppData mockAppData = AppData(favoriteDates: mockDates);
   // ignore: invalid_use_of_visible_for_testing_member
   SharedPreferences.setMockInitialValues(
-      {AppStorage.KEY: jsonEncode(mockAppData)});
+      {AppStorage.FAVORITES_KEY: jsonEncode(mockAppData)});
 }

@@ -13,6 +13,7 @@ class AboutScreen extends StatelessWidget {
   Widget appDeveloperLinks(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
           icon: Image.asset('images/icons/github.png'),
@@ -103,8 +104,8 @@ class AboutScreen extends StatelessWidget {
           children: [
             Expanded(
               child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                child: ListView(
+                  shrinkWrap: true,
                   children: [
                     appLogo,
                     SizedBox(height: 32),

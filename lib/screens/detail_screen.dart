@@ -5,9 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:share/share.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -170,6 +168,13 @@ class ApodDetail extends StatelessWidget {
       ),
     );
 
+    ShareButton _shareButton = ShareButton(
+      date: apod.date,
+      mediaType: apod.mediaType,
+      mediaUrl: apod.url,
+      title: apod.title,
+    );
+
     Widget _apodInformationCard = Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -207,13 +212,7 @@ class ApodDetail extends StatelessWidget {
                       ),
                     ),
                     if (noScaffold) FavoriteToggle(apod: apod),
-                    if (noScaffold)
-                      ShareButton(
-                        date: apod.date,
-                        mediaType: apod.mediaType,
-                        mediaUrl: apod.url,
-                        title: apod.title,
-                      ),
+                    if (noScaffold) _shareButton,
                   ],
                 ),
 
@@ -347,22 +346,18 @@ class _ShareButtonState extends State<ShareButton> {
       setState(() {
         _isLoading = true;
       });
-      // Fetch Image
-      http.Response response = await http.get(widget.mediaUrl);
 
-      // Get Application path
-      final String directory = (await getApplicationDocumentsDirectory()).path;
-      final String fileDir = '$directory/apod_share.png';
+      try {
+        String fileDir = await cacheImage(widget.mediaUrl, 'share.png');
 
-      // Create new file, then write as bytes
-      File imageFile = new File(fileDir);
-      imageFile.writeAsBytesSync(response.bodyBytes);
+        Share.shareFiles(
+          [fileDir],
+          subject: "NASA's Photo of the Day",
+          text:
+              "Check out this photo of ${widget.title} taken on ${widget.date}",
+        );
+      } catch (_) {}
 
-      Share.shareFiles(
-        [fileDir],
-        subject: "NASA's Photo of the Day",
-        text: "Check out this photo of ${widget.title} taken on ${widget.date}",
-      );
       setState(() {
         _isLoading = false;
       });

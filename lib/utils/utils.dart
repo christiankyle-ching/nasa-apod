@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 // Alert Dialogs
 final AlertDialog _dialogNoInternet = AlertDialog(
@@ -146,4 +150,19 @@ void launchUrl(BuildContext context, String url) async {
   } else {
     showSnackbar(context, 'Cannot open link: $url');
   }
+}
+
+Future<String> cacheImage(String mediaUrl, String filename) async {
+  // Fetch Image
+  http.Response response = await http.get(mediaUrl);
+
+  // Get Application path
+  final String directory = (await getApplicationDocumentsDirectory()).path;
+  final String fileDir = '$directory/$filename';
+
+  // Create new file, then write as bytes
+  File imageFile = new File(fileDir);
+  imageFile.writeAsBytesSync(response.bodyBytes);
+
+  return fileDir;
 }

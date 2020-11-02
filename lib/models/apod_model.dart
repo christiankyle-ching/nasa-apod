@@ -77,7 +77,7 @@ class ApodModel extends ChangeNotifier {
 
   ApodModel() {
     // Get Local Storage Data, then set to runtime variables
-    appStorage.getData().then((appData) {
+    appStorage.getFavorites().then((appData) {
       // Map date string list to DateTime objects
       List<DateTime> storageFavorites =
           AppData.convertListStringToDateTime(appData.favoriteDates);
@@ -177,7 +177,7 @@ class ApodModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // DEBUG:
+  // DEBUG
   void _showFavoritesCount() {
     print('Favorites Count: ${_favoriteApodDates.length}');
   }
@@ -187,6 +187,6 @@ class ApodModel extends ChangeNotifier {
     _favoriteApodDates.sort((a, b) => a.compareTo(b));
     List<String> faveApodDatesString =
         AppData.convertListDateTimeToString(_favoriteApodDates);
-    appStorage.saveData(AppData(favoriteDates: faveApodDatesString));
+    appStorage.saveFavorites(AppData(favoriteDates: faveApodDatesString));
   }
 }

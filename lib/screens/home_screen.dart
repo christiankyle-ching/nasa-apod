@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/apod_model.dart';
+import 'package:nasa_apod/models/app_storage.dart';
 import 'package:nasa_apod/screens/recents_screen.dart';
 import 'package:nasa_apod/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,71 @@ class AppScaffold extends StatefulWidget {
 
   @override
   _AppScaffoldState createState() => _AppScaffoldState();
+}
+
+class DailyWallpaperSetting extends StatefulWidget {
+  DailyWallpaperSetting({Key key});
+
+  @override
+  _DailyWallpaperSettingState createState() => _DailyWallpaperSettingState();
+}
+
+class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
+  bool value = false;
+  bool enabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initValue();
+  }
+
+  void initValue() async {
+    bool setting = await AppStorage.getDynamicWallpaper();
+    setState(() {
+      value = setting;
+      enabled = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      title: Text('Daily Wallpaper?'),
+      value: value,
+      onChanged: (enabled)
+          ? (bool newValue) {
+              if (newValue) {
+                showDialog(
+                    context: context,
+                    child: AlertDialog(
+                      actions: [
+                        FlatButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Cancel'),
+                        ),
+                        RaisedButton(
+                          onPressed: () {
+                            AppStorage.setDynamicWallpaper(newValue);
+                            Navigator.pop(context);
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                      content: Text(
+                        'This setting will change your wallpaper, and will try to change your wallpaper for this day.\n\nDo you want to continue?',
+                      ),
+                    ));
+              } else {
+                AppStorage.setDynamicWallpaper(newValue);
+              }
+              setState(() {
+                value = newValue;
+              });
+            }
+          : null,
+    );
+  }
 }
 
 class _AppScaffoldState extends State<AppScaffold> {
@@ -91,21 +157,23 @@ class _AppScaffoldState extends State<AppScaffold> {
     return Scaffold(
       // Side-bar Navigation
       drawer: Drawer(
-          child: ListView(
-        children: [
-          DrawerHeader(
-            child: Text("NASA's Astronomy Picture of the Day"),
-          ),
-          ListTile(
-            leading: Icon(Icons.info),
-            title: Text('About'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/about');
-            },
-          ),
-        ],
-      )),
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Text("NASA's Astronomy Picture of the Day"),
+            ),
+            DailyWallpaperSetting(key: ValueKey('dailyWallpaperSetting')),
+            ListTile(
+              leading: Icon(Icons.info),
+              title: Text('About'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/about');
+              },
+            ),
+          ],
+        ),
+      ),
 
       // App Bar
       appBar: AppBar(
