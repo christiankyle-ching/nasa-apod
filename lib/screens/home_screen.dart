@@ -5,6 +5,7 @@ import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/models/app_storage.dart';
 import 'package:nasa_apod/screens/recents_screen.dart';
+import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -12,15 +13,9 @@ import 'detail_screen.dart';
 import 'favorites_screen.dart';
 
 // Global Widgets
-class AppScaffold extends StatefulWidget {
-  static const String routeName = '/';
-
-  @override
-  _AppScaffoldState createState() => _AppScaffoldState();
-}
 
 class DailyWallpaperSetting extends StatefulWidget {
-  DailyWallpaperSetting({Key key});
+  DailyWallpaperSetting({Key key}) : super(key: key);
 
   @override
   _DailyWallpaperSettingState createState() => _DailyWallpaperSettingState();
@@ -89,6 +84,13 @@ class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
           : null,
     );
   }
+}
+
+class AppScaffold extends StatefulWidget {
+  static const String routeName = '/';
+
+  @override
+  _AppScaffoldState createState() => _AppScaffoldState();
 }
 
 class _AppScaffoldState extends State<AppScaffold> {
@@ -166,9 +168,7 @@ class _AppScaffoldState extends State<AppScaffold> {
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(
-              child: Text("NASA's Astronomy Picture of the Day"),
-            ),
+            AppDrawerHeader(),
             DailyWallpaperSetting(key: ValueKey('dailyWallpaperSetting')),
             ListTile(
               leading: Icon(Icons.info),
@@ -221,6 +221,35 @@ class _AppScaffoldState extends State<AppScaffold> {
         ],
         currentIndex: _currentTab,
         onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class AppDrawerHeader extends StatelessWidget {
+  const AppDrawerHeader({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DrawerHeader(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        image: DecorationImage(
+          colorFilter: new ColorFilter.mode(
+              Colors.black.withOpacity(0.35), BlendMode.dstATop),
+          fit: BoxFit.cover,
+          image: AssetImage('images/icons/logo.png'),
+        ),
+      ),
+      child: Center(
+        child: Text(
+          "NASA's Astronomy Picture of the Day",
+          style: appTheme.textTheme.headline5
+              .copyWith(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

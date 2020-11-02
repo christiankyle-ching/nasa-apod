@@ -35,7 +35,7 @@ class _ApodListViewState extends State<ApodListView> {
     String message = (widget.willLoadFavorites)
         ? 'Loading your favorites. Please wait...'
         : 'Loading next ${ApodApi.itemPerPage} photos. Please wait...';
-    showSnackbar(context, message, duration: 1000);
+    showSnackbar(context, message, duration: 30);
   }
 
   void _endLoading() {
@@ -103,11 +103,9 @@ class _ApodListViewState extends State<ApodListView> {
         if (apodModel.listOfApods.length <= 0) {
           _startLoading();
           try {
-            apodModel.fetchNextApods();
+            apodModel.fetchNextApods().whenComplete(() => _endLoading());
           } catch (error) {
             showSnackbar(context, 'Unknown error occured: $error');
-          } finally {
-            _endLoading();
           }
         }
 
