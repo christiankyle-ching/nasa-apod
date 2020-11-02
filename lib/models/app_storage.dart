@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:nasa_apod/tasks/wallpaper_task.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workmanager/workmanager.dart';
 
 class AppData {
   List<String> favoriteDates;
@@ -72,6 +71,6 @@ class AppStorage {
 
     print('Dynamic Wallpaper: $newValue');
 
-    updateWorkManager(newValue);
+    updateWallpaperTask(newValue);
   }
 }

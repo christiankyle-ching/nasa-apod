@@ -30,4 +30,19 @@ Future<dynamic> selectNotification(String payload) async {
 }
 
 Future onDidReceiveLocalNotification(
-    int id, String title, String body, String payload) async {}
+    int id, String title, String body, String payload) async {
+  // TODO: implement this
+}
+
+void sendNotification(String title, String message) async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails('com.ckchingdev.nasa_apod',
+          'nasa-apod-channel', 'Notifications for NASA APoD',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker');
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.show(
+      0, title, message, platformChannelSpecifics);
+}

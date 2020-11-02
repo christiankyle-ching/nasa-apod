@@ -50,34 +50,41 @@ class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
       title: Text('Daily Wallpaper?'),
       value: value,
       onChanged: (enabled)
-          ? (bool newValue) {
+          ? (bool newValue) async {
               if (newValue) {
-                showDialog(
+                bool chosenValue = await showDialog(
                     context: context,
+                    barrierDismissible: false,
                     child: AlertDialog(
                       actions: [
                         FlatButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
                           child: Text('Cancel'),
                         ),
                         RaisedButton(
                           onPressed: () {
                             AppStorage.setDynamicWallpaper(newValue);
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           },
                           child: Text('OK'),
                         ),
                       ],
                       content: Text(
-                        'This setting will change your wallpaper, and will try to change your wallpaper for this day.\n\nDo you want to continue?',
+                        'This setting will update your wallpaper everyday (starting this day) if it is a photo from NASA.\n\nDo you want to continue?',
                       ),
                     ));
+
+                setState(() {
+                  value = chosenValue;
+                });
               } else {
                 AppStorage.setDynamicWallpaper(newValue);
+                setState(() {
+                  value = newValue;
+                });
               }
-              setState(() {
-                value = newValue;
-              });
             }
           : null,
     );

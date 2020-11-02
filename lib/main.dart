@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:nasa_apod/screens/about_screen.dart';
 import 'package:nasa_apod/screens/detail_screen.dart';
 import 'package:nasa_apod/tasks/notifications.dart';
-import 'package:nasa_apod/tasks/wallpaper_task.dart';
+import 'package:nasa_apod/tasks/tasks.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,8 +19,7 @@ void main() {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  initializeWallpaperTask();
-
+  initializeBackgroundTasks();
   initializeNotifications();
 
   runApp(ChangeNotifierProvider(
