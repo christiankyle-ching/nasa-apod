@@ -100,7 +100,7 @@ class _ApodListViewState extends State<ApodListView> {
         return ListView.builder(
             itemCount: apodModel.favoriteApods.length,
             itemBuilder: (context, index) =>
-                ApodTile(apod: apodModel.favoriteApods[index]));
+                ApodListTile(apod: apodModel.favoriteApods[index]));
       },
     );
   }
@@ -118,7 +118,7 @@ class _ApodListViewState extends State<ApodListView> {
           controller: _scrollController,
           itemCount: apodModel.listOfApods.length,
           itemBuilder: (context, index) =>
-              ApodTile(apod: apodModel.listOfApods[index]),
+              ApodListTile(apod: apodModel.listOfApods[index]),
         );
       },
     );
@@ -134,10 +134,10 @@ class _ApodListViewState extends State<ApodListView> {
   }
 }
 
-class ApodTile extends StatelessWidget {
+class ApodListTile extends StatelessWidget {
   final Apod apod;
 
-  ApodTile({Key key, @required this.apod}) : super(key: key);
+  ApodListTile({Key key, @required this.apod}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -185,12 +185,9 @@ class ApodTile extends StatelessWidget {
                       height: 8,
                     ),
                     // Title
-                    Hero(
-                      tag: apod.title,
-                      child: Text(
-                        apod.title,
-                        style: titleStyle,
-                      ),
+                    Text(
+                      apod.title,
+                      style: titleStyle,
                     ),
                   ],
                 ),
