@@ -11,7 +11,7 @@ const String NOTIFICATION_TITLE = 'APOD Daily Wallpaper';
 const String CHANGE_WALLPAPER_TASKNAME = 'changeWallpaperTask';
 const String WALLPAPER_CACHE_FILENAME = 'dynamic_wallpaper.png';
 const String LAST_WALLPAPER_UPDATE_KEY = 'lastWallpaperUpdate';
-// REFACTOR: change frequency duration. 15 minutes only for debugging
+// DEBUG: change frequency duration. 15 minutes only for debugging
 const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 15;
 
 Future<void> updateWallpaperTask(bool enable) async {

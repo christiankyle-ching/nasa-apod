@@ -21,7 +21,8 @@ void callbackDispatcher() {
 void initializeBackgroundTasks() async {
   Workmanager.initialize(
     callbackDispatcher,
-    isInDebugMode: true,
+    // DEBUG
+    // isInDebugMode: true,
   );
 
   updateWallpaperTask(await AppStorage.getDynamicWallpaper());

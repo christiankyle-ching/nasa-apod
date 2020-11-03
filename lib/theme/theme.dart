@@ -15,6 +15,19 @@ Color _hexColor(String hexCode) {
   return Color(colorCode);
 }
 
+final List<BoxShadow> textShadow = [
+  BoxShadow(
+    blurRadius: 3,
+    color: Colors.black,
+    offset: Offset(2, 2),
+  ),
+  BoxShadow(
+    blurRadius: 5,
+    color: Colors.black.withOpacity(0.8),
+    offset: Offset(4, 4),
+  )
+];
+
 // Shared Theme Options
 final TextStyle titleStyle = appTheme.textTheme.headline5;
 final double imageMaxHeight = 200.0;
