@@ -103,6 +103,9 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   Future<Apod> _futureHighlightApod;
 
+  // ignore: unused_field
+  ApodModel _apodModel = ApodModel();
+
   @override
   void initState() {
     super.initState();
@@ -169,7 +172,9 @@ class _AppScaffoldState extends State<AppScaffold> {
         child: ListView(
           children: [
             AppDrawerHeader(),
-            DailyWallpaperSetting(key: ValueKey('dailyWallpaperSetting')),
+            DailyWallpaperSetting(
+              key: ValueKey('dailyWallpaperSetting'),
+            ),
             ListTile(
               leading: Icon(Icons.info),
               title: Text('About'),

@@ -75,20 +75,6 @@ class ApodModel extends ChangeNotifier {
 
   DateTime _lastLoadedDate = ApodApi.initDate;
 
-  ApodModel() {
-    // Get Local Storage Data, then set to runtime variables
-    appStorage.getFavorites().then((appData) {
-      // Map date string list to DateTime objects
-      List<DateTime> storageFavorites =
-          AppData.convertListStringToDateTime(appData.favoriteDates);
-
-      _favoriteApodDates.addAll(storageFavorites);
-      fetchAllFavoriteApods();
-
-      notifyListeners();
-    });
-  }
-
   // Recents List
   bool _isRecentsLoading = false;
   bool get isRecentsLoading => _isRecentsLoading;
@@ -105,8 +91,10 @@ class ApodModel extends ChangeNotifier {
           _listOfApods.add(apod);
         } on SocketException catch (_) {
           rethrow;
-        } catch (_) {
-          rethrow;
+        } catch (httpError) {
+          if (httpError != 404) {
+            i--; // if apod does not exist, adjust counter to add more to list
+          }
         }
 
         if (i == ApodApi.itemPerPage - 1) {
@@ -115,9 +103,9 @@ class ApodModel extends ChangeNotifier {
         }
       }
       _isRecentsLoading = false;
-    }
 
-    notifyListeners();
+      notifyListeners();
+    }
   }
 
   // Favorites
@@ -162,19 +150,28 @@ class ApodModel extends ChangeNotifier {
 
   Future<void> fetchAllFavoriteApods() async {
     if (!_loadedFavorites) {
-      for (DateTime date in _favoriteApodDates) {
-        try {
-          _favoriteApods.add(await ApodApi.fetchApodByDate(date));
-        } on SocketException catch (_) {
-          rethrow;
-        } catch (_) {
-          rethrow;
-        }
-      }
-      _loadedFavorites = true;
-    }
+      await appStorage.getFavorites().then((appData) async {
+        // Map date string list to DateTime objects
+        List<DateTime> storageFavorites =
+            AppData.convertListStringToDateTime(appData.favoriteDates);
 
-    notifyListeners();
+        _favoriteApodDates.addAll(storageFavorites);
+
+        for (DateTime date in _favoriteApodDates) {
+          try {
+            _favoriteApods.add(await ApodApi.fetchApodByDate(date));
+          } on SocketException catch (_) {
+            rethrow;
+          } catch (_) {
+            rethrow;
+          }
+        }
+
+        _loadedFavorites = true;
+      });
+
+      notifyListeners();
+    }
   }
 
   // DEBUG

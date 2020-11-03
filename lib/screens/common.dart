@@ -32,6 +32,7 @@ class _ApodListViewState extends State<ApodListView> {
   }
 
   void _startLoading() {
+    removeAllSnackbars(context);
     String message = (widget.willLoadFavorites)
         ? 'Loading your favorites. Please wait...'
         : 'Loading next ${ApodApi.itemPerPage} photos. Please wait...';
@@ -40,6 +41,9 @@ class _ApodListViewState extends State<ApodListView> {
 
   void _endLoading() {
     removeAllSnackbars(context);
+
+    // FIX: force rebuild on infinite list only
+    setState(() {});
   }
 
   void _scrollListener() async {
@@ -48,30 +52,34 @@ class _ApodListViewState extends State<ApodListView> {
             _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
       print('Reached the end of the list');
+      _callFetchNext();
+    }
+  }
 
-      _startLoading();
-      try {
-        await Provider.of<ApodModel>(context, listen: false).fetchNextApods();
-      } on SocketException catch (_) {
-        return showNoInternetError(context);
-      } catch (error) {
-        showSnackbar(context, 'Unknown error occured: $error');
-      } finally {
-        _endLoading();
-      }
+  void _callFetchNext() async {
+    _startLoading();
+    try {
+      await Provider.of<ApodModel>(context, listen: false)
+          .fetchNextApods()
+          .whenComplete(() => _endLoading());
+    } on SocketException catch (_) {
+      return showNoInternetError(context);
+    } catch (error) {
+      showSnackbar(context, 'Unknown error occured: $error');
     }
   }
 
   Widget _buildFavoritesList(BuildContext context) {
+    if (!Provider.of<ApodModel>(context, listen: false).loadedFavorites) {
+      _startLoading();
+      Provider.of<ApodModel>(context, listen: false)
+          .fetchAllFavoriteApods()
+          .whenComplete(() => _endLoading());
+      return Container(); // return nothing, but show snackbar
+    }
+
     return Consumer<ApodModel>(
       builder: (_, apodModel, __) {
-        if (!apodModel.loadedFavorites) {
-          _startLoading();
-          return Container(); // return nothing, but show snackbar
-        } else {
-          _endLoading();
-        }
-
         if (apodModel.favoriteApodDates.length <= 0) {
           return Center(
             child: RichText(
@@ -98,22 +106,20 @@ class _ApodListViewState extends State<ApodListView> {
   }
 
   Widget _buildInfiniteList(BuildContext context) {
+    if (Provider.of<ApodModel>(context, listen: false).listOfApods.length <=
+        0) {
+      _callFetchNext();
+      return Container();
+    }
+
     return Consumer<ApodModel>(
       builder: (_, apodModel, __) {
-        if (apodModel.listOfApods.length <= 0) {
-          _startLoading();
-          try {
-            apodModel.fetchNextApods().whenComplete(() => _endLoading());
-          } catch (error) {
-            showSnackbar(context, 'Unknown error occured: $error');
-          }
-        }
-
         return ListView.builder(
-            controller: _scrollController,
-            itemCount: apodModel.listOfApods.length,
-            itemBuilder: (context, index) =>
-                ApodTile(apod: apodModel.listOfApods[index]));
+          controller: _scrollController,
+          itemCount: apodModel.listOfApods.length,
+          itemBuilder: (context, index) =>
+              ApodTile(apod: apodModel.listOfApods[index]),
+        );
       },
     );
   }

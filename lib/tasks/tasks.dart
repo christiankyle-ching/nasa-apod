@@ -9,7 +9,7 @@ void callbackDispatcher() {
 
     switch (task) {
       case CHANGE_WALLPAPER_TASKNAME:
-        await changeWallpaper();
+        await attemptChangeWallpaper();
         return true;
       default:
         return true;

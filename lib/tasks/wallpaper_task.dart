@@ -14,7 +14,7 @@ const String LAST_WALLPAPER_UPDATE_KEY = 'lastWallpaperUpdate';
 // REFACTOR: change frequency duration. 15 minutes only for debugging
 const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 15;
 
-void updateWallpaperTask(bool enable) {
+Future<void> updateWallpaperTask(bool enable) async {
   if (enable) {
     print('START TASK');
     Workmanager.registerPeriodicTask(
@@ -26,41 +26,53 @@ void updateWallpaperTask(bool enable) {
     print('CLEAR TASK');
     Workmanager.cancelByUniqueName('1');
 
-    _setLastWallpaperDate(ApodApi.dateRange.end);
+    await _setLastWallpaperDate(ApodApi.dateRange.start);
   }
 }
 
-Future<void> changeWallpaper() async {
+Future<void> attemptChangeWallpaper() async {
   print('CHANGE_WALLPAPER_ATTEMPT');
 
-  try {
-    Apod apod = await ApodApi.fetchApodByDate(_getDateToday());
-    DateTime _lastLoadedDate = await _getLastWallpaperDate();
+  DateTime dateToday = _getDateToday();
+  DateTime _lastLoadedDate = await _getLastWallpaperDate();
 
-    print('Last Loaded Date: $_lastLoadedDate');
-    if (apod.mediaType == MediaType.image && apod.date != _lastLoadedDate) {
-      // Download image, then set wallpaper
-      String fileDir = await cacheImage(apod.url, WALLPAPER_CACHE_FILENAME);
-      await WallpaperManager.setWallpaperFromFile(
-          fileDir, WallpaperManager.HOME_SCREEN);
+  if (dateToday != _lastLoadedDate) {
+    Apod apod = await ApodApi.fetchApodByDate(dateToday);
 
-      await _setLastWallpaperDate(apod.date);
+    switch (apod.mediaType) {
+      case MediaType.image:
+        try {
+          await changeWallpaper(apod);
+          sendNotification(
+              NOTIFICATION_TITLE, 'Wallpaper has been set to ${apod.title}');
+        } catch (err) {
+          print('CHANGE_WALLPAPER_ERROR');
+        }
 
-      sendNotification(
-        NOTIFICATION_TITLE,
-        'Wallpaper has been set to ${apod.title}',
-      );
-      print('CHANGE_WALLPAPER_SUCCESS');
-    } else {
-      print('CHANGE_WALLPAPER_ALREADY_DONE');
+        print('CHANGE_WALLPAPER_SUCCESS');
+        break;
+
+      // If apod today is video, skip
+      case MediaType.video:
+        await _setLastWallpaperDate(apod.date);
+        print('CHANGE_WALLPAPER_SKIPPED');
+        break;
     }
-  } catch (err) {
-    print('CHANGE_WALLPAPER_FAILED');
+  } else {
+    // if last loaded date is today, already done
+    print('CHANGE_WALLPAPER_ALREADY_DONE');
+  }
+}
 
-    sendNotification(
-      NOTIFICATION_TITLE,
-      'Failed to set daily wallpaper',
-    );
+Future<void> changeWallpaper(Apod apod) async {
+  try {
+    // Download image, then set wallpaper
+    String fileDir = await cacheImage(apod.url, WALLPAPER_CACHE_FILENAME);
+    await WallpaperManager.setWallpaperFromFile(
+        fileDir, WallpaperManager.HOME_SCREEN);
+    await _setLastWallpaperDate(apod.date);
+  } catch (_) {
+    rethrow;
   }
 }
 

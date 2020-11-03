@@ -69,8 +69,6 @@ class AppStorage {
 
     prefs.setBool(AppStorage._ENABLE_DYNAMIC_WALLPAPER, newValue);
 
-    print('Dynamic Wallpaper: $newValue');
-
     updateWallpaperTask(newValue);
   }
 }

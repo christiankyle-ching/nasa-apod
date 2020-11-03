@@ -27,6 +27,7 @@ void showNoInternetError(BuildContext context) async {
 
 // Snackbars
 showSnackbar(BuildContext context, String message, {int duration = 4}) async {
+  removeAllSnackbars(context);
   // FIX: setState called during build
   await Future.delayed(Duration(microseconds: 1));
   return Scaffold.of(context).showSnackBar(
