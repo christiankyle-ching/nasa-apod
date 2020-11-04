@@ -7,7 +7,6 @@ import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
-import 'package:nasa_apod/theme/theme.dart';
 
 class DetailScreen extends StatelessWidget {
   static const String routeName = '/detail';
@@ -159,16 +158,26 @@ class ApodDetail extends StatelessWidget {
     );
 
     Widget _apodInformation = SliverList(
-      delegate: SliverChildListDelegate([
-        SizedBox(height: 24),
-        _date,
-        SizedBox(height: 16),
-        if (apod.copyright.isNotEmpty) _copyrightRow,
-        if (apod.copyright.isNotEmpty) SizedBox(height: 16),
-        _description,
-        SizedBox(height: 24),
-      ]),
-    );
+        delegate: SliverChildListDelegate(
+      [
+        Container(
+          constraints: BoxConstraints(
+              // FIX: SliverAppBar not stretching if content is short
+              minHeight: MediaQuery.of(context).size.height - 225),
+          child: Column(
+            children: [
+              SizedBox(height: 24),
+              _date,
+              SizedBox(height: 16),
+              if (apod.copyright.isNotEmpty) _copyrightRow,
+              if (apod.copyright.isNotEmpty) SizedBox(height: 16),
+              _description,
+              SizedBox(height: 24),
+            ],
+          ),
+        )
+      ],
+    ));
 
     return CustomScrollView(
       physics: BouncingScrollPhysics(),
@@ -181,9 +190,8 @@ class ApodDetail extends StatelessWidget {
           mediaPreview: _mediaPreview,
           noScaffold: noScaffold,
         ),
+        // TODO: Fix - enable overscroll
         _apodInformation,
-        // FIX: to enable overscroll
-        SliverFillRemaining(),
       ],
     );
   }
