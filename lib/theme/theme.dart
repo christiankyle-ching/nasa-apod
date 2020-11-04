@@ -18,12 +18,12 @@ Color _hexColor(String hexCode) {
 final List<BoxShadow> textShadow = [
   BoxShadow(
     blurRadius: 3,
-    color: Colors.black,
+    color: Colors.black.withOpacity(0.8),
     offset: Offset(2, 2),
   ),
   BoxShadow(
     blurRadius: 5,
-    color: Colors.black.withOpacity(0.8),
+    color: Colors.black.withOpacity(0.5),
     offset: Offset(4, 4),
   )
 ];

@@ -72,59 +72,91 @@ class DetailScreen extends StatelessWidget {
   }
 }
 
-class ApodDetail extends StatelessWidget {
+class ApodDetail extends StatefulWidget {
   final Apod apod;
   final bool noScaffold;
-  final double sidePadding = 24;
 
   ApodDetail({@required this.apod, this.noScaffold = false});
 
   @override
+  _ApodDetailState createState() => _ApodDetailState();
+}
+
+class _ApodDetailState extends State<ApodDetail> {
+  ScrollController _scrollController;
+
+  final double sidePadding = 24;
+  bool isTitleExpanded = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  _scrollListener() {
+    if (_scrollController.offset >= 120) {
+      setState(() {
+        isTitleExpanded = false;
+      });
+    } else {
+      setState(() {
+        isTitleExpanded = true;
+      });
+    }
+    print(isTitleExpanded);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final FavoriteToggle _favoriteToggle = FavoriteToggle(apod: apod);
+    final FavoriteToggle _favoriteToggle = FavoriteToggle(apod: widget.apod);
 
     final ShareButton _shareButton = ShareButton(
-      date: apod.date,
-      mediaType: apod.mediaType,
-      mediaUrl: apod.url,
-      title: apod.title,
+      date: widget.apod.date,
+      mediaType: widget.apod.mediaType,
+      mediaUrl: widget.apod.url,
+      title: widget.apod.title,
     );
 
-    Widget _date = Padding(
-        padding: EdgeInsets.symmetric(horizontal: sidePadding),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                DateFormat.yMMMMd().format(apod.date),
-                style: appTheme.textTheme.headline6,
-              ),
-            ),
-            if (noScaffold) _favoriteToggle,
-            if (noScaffold) _shareButton,
-          ],
-        ));
+    Widget _date = Row(
+      children: [
+        Expanded(
+          child: Text(
+            DateFormat.yMMMMd().format(widget.apod.date),
+            style: appTheme.textTheme.headline6,
+          ),
+        ),
+        if (widget.noScaffold) _favoriteToggle,
+        if (widget.noScaffold) _shareButton,
+      ],
+    );
 
     Widget _title = Text(
-      apod.title,
+      widget.apod.title,
       style: appTheme.textTheme.headline6.copyWith(
         shadows: textShadow,
       ),
+      maxLines: (isTitleExpanded) ? null : 1,
+      overflow: (isTitleExpanded) ? null : TextOverflow.ellipsis,
     );
 
     Widget _mediaPreview = GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, MediaScreen.routeName, arguments: apod);
+        Navigator.pushNamed(context, MediaScreen.routeName,
+            arguments: widget.apod);
       },
       child: Hero(
-        tag: 'apodMedia${apod.title}',
+        tag: 'apodMedia${widget.apod.title}',
         child: Container(
           constraints: BoxConstraints(
             maxHeight: imageMaxHeight,
             minHeight: imageMaxHeight,
           ),
           width: double.infinity,
-          child: buildMediaPreview(context, apod.mediaType, apod.url),
+          child: buildMediaPreview(
+              context, widget.apod.mediaType, widget.apod.url),
         ),
       ),
     );
@@ -132,29 +164,23 @@ class ApodDetail extends StatelessWidget {
     TextStyle _copyrightTextStyle = appTheme.textTheme.subtitle1.copyWith(
       fontWeight: FontWeight.bold,
     );
-    Widget _copyrightRow = Padding(
-      padding: EdgeInsets.symmetric(horizontal: sidePadding),
-      child: Row(
-        children: [
-          Text(
-            '${apod.copyright} ',
-            style: _copyrightTextStyle,
-          ),
-          Icon(
-            Icons.copyright,
-            size: _copyrightTextStyle.fontSize,
-            color: _copyrightTextStyle.color,
-          ),
-        ],
-      ),
+    Widget _copyrightRow = Row(
+      children: [
+        Text(
+          '${widget.apod.copyright} ',
+          style: _copyrightTextStyle,
+        ),
+        Icon(
+          Icons.copyright,
+          size: _copyrightTextStyle.fontSize,
+          color: _copyrightTextStyle.color,
+        ),
+      ],
     );
 
-    Widget _description = Padding(
-      padding: EdgeInsets.symmetric(horizontal: sidePadding),
-      child: Text(
-        '${apod.explanation}',
-        style: appTheme.textTheme.bodyText1.copyWith(height: 1.5),
-      ),
+    Widget _explanation = Text(
+      '${widget.apod.explanation}',
+      style: appTheme.textTheme.bodyText1.copyWith(height: 1.5),
     );
 
     Widget _apodInformation = SliverList(
@@ -164,36 +190,68 @@ class ApodDetail extends StatelessWidget {
           constraints: BoxConstraints(
               // FIX: SliverAppBar not stretching if content is short
               minHeight: MediaQuery.of(context).size.height - 225),
-          child: Column(
-            children: [
-              SizedBox(height: 24),
-              _date,
-              SizedBox(height: 16),
-              if (apod.copyright.isNotEmpty) _copyrightRow,
-              if (apod.copyright.isNotEmpty) SizedBox(height: 16),
-              _description,
-              SizedBox(height: 24),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _date,
+                SizedBox(height: 16),
+                if (widget.apod.copyright.isNotEmpty) _copyrightRow,
+                if (widget.apod.copyright.isNotEmpty) SizedBox(height: 16),
+                Text('Explanation', style: appTheme.textTheme.subtitle2),
+                Divider(),
+                _explanation,
+              ],
+            ),
           ),
         )
       ],
     ));
 
+    Widget mediaAppBar = SliverAppBar(
+      leading: (widget.noScaffold) ? Container() : null,
+      actions: (!widget.noScaffold) ? [_favoriteToggle, _shareButton] : [],
+      elevation: 8.0,
+      forceElevated: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: _mediaPreview,
+        title: IgnorePointer(
+          ignoring: true,
+          child: _title,
+        ),
+        titlePadding: (widget.noScaffold)
+            ? null
+            : EdgeInsetsDirectional.only(start: 54, bottom: 16, end: 82),
+        stretchModes: [StretchMode.zoomBackground, StretchMode.fadeTitle],
+        centerTitle: widget.noScaffold,
+      ),
+      expandedHeight: 225,
+      floating: false,
+      pinned: true,
+      stretch: true,
+      stretchTriggerOffset: 125,
+      onStretchTrigger: () => _handleOnStretch(context, widget.apod),
+    );
+
     return CustomScrollView(
+      controller: _scrollController,
       physics: BouncingScrollPhysics(),
       slivers: <Widget>[
-        MediaAppBar(
-          apod: apod,
-          title: _title,
-          favoriteToggle: _favoriteToggle,
-          shareButton: _shareButton,
-          mediaPreview: _mediaPreview,
-          noScaffold: noScaffold,
-        ),
-        // TODO: Fix - enable overscroll
+        mediaAppBar,
         _apodInformation,
       ],
     );
+  }
+
+  Future<void> _handleOnStretch(BuildContext context, Apod apod) async {
+    await Future.delayed(Duration(microseconds: 1));
+    try {
+      Navigator.pushNamed(context, MediaScreen.routeName, arguments: apod);
+    } catch (_) {
+      print('FAILED_PULL_MEDIA');
+    }
   }
 }
 
