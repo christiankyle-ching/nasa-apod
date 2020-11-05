@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/app_storage.dart';
+import 'package:nasa_apod/utils/utils.dart';
 
 enum MediaType { image, video }
 
@@ -54,7 +55,6 @@ class Apod {
   }
 }
 
-// Provider / ChangeNotifier
 class ApodModel extends ChangeNotifier {
   ApodModel() {
     fetchAllFavoriteApods();
@@ -62,22 +62,25 @@ class ApodModel extends ChangeNotifier {
 
   final AppStorage appStorage = AppStorage();
 
+  // List of Favorite Apods, DateTime only
   final List<DateTime> _favoriteApodDates = List<DateTime>();
 
   UnmodifiableListView<DateTime> get favoriteApodDates =>
       UnmodifiableListView(_favoriteApodDates);
 
+  // List of Favorite Apods
   final List<Apod> _favoriteApods = List<Apod>();
 
   UnmodifiableListView<Apod> get favoriteApods =>
       UnmodifiableListView(_favoriteApods);
 
+  // List of Recent Apods
   final List<Apod> _listOfApods = List<Apod>();
 
   UnmodifiableListView<Apod> get listOfApods =>
       UnmodifiableListView(_listOfApods);
 
-  DateTime _lastLoadedDate = ApodApi.initDate;
+  DateTime _lastLoadedDate = ApodApi.getInitDate();
 
   // Recents List
   bool _isRecentsLoading = false;
@@ -142,6 +145,7 @@ class ApodModel extends ChangeNotifier {
   void clearFavorites() {
     _favoriteApodDates.clear();
     _favoriteApods.clear();
+
     notifyListeners();
     updateStorage();
 
@@ -152,11 +156,9 @@ class ApodModel extends ChangeNotifier {
 
   Future<void> fetchAllFavoriteApods() async {
     if (!_loadedFavorites) {
-      AppData appData = await appStorage.getFavorites();
-
-      // Map date string list to DateTime objects
+      List<String> favoriteApodDates = await appStorage.getFavorites();
       List<DateTime> storageFavorites =
-          AppData.convertListStringToDateTime(appData.favoriteDates);
+          convertListStringToDateTime(favoriteApodDates);
 
       _favoriteApodDates.addAll(storageFavorites);
 
@@ -171,9 +173,8 @@ class ApodModel extends ChangeNotifier {
       }
 
       _loadedFavorites = true;
+      notifyListeners();
     }
-
-    notifyListeners();
   }
 
   // DEBUG
@@ -185,7 +186,7 @@ class ApodModel extends ChangeNotifier {
     // Sort before updating to storage
     _favoriteApodDates.sort((a, b) => a.compareTo(b));
     List<String> faveApodDatesString =
-        AppData.convertListDateTimeToString(_favoriteApodDates);
-    appStorage.saveFavorites(AppData(favoriteDates: faveApodDatesString));
+        convertListDateTimeToString(_favoriteApodDates);
+    appStorage.saveFavorites(faveApodDatesString);
   }
 }

@@ -167,3 +167,11 @@ Future<String> cacheImage(String mediaUrl, String filename) async {
 
   return fileDir;
 }
+
+List<String> convertListDateTimeToString(List<DateTime> listDateTime) {
+  return listDateTime.map((datetime) => datetime.toIso8601String()).toList();
+}
+
+List<DateTime> convertListStringToDateTime(List<String> listString) {
+  return listString.map((dateStr) => DateTime.parse(dateStr)).toList();
+}

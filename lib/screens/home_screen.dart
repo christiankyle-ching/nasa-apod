@@ -106,9 +106,6 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   Future<Apod> _futureHighlightApod;
 
-  // ignore: unused_field
-  ApodModel _apodModel = ApodModel();
-
   @override
   void initState() {
     super.initState();

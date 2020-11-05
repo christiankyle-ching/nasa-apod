@@ -259,11 +259,11 @@ class FavoriteToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ApodModel>(builder: (_, apodModel, __) {
       bool inFavorites = apodModel.favoriteApodDates.contains(apod.date);
-      bool enable = apodModel.loadedFavorites;
+      bool enabled = apodModel.loadedFavorites;
 
       return IconButton(
           icon: Icon((inFavorites) ? Icons.star : Icons.star_border),
-          onPressed: (enable)
+          onPressed: (enabled)
               ? () {
                   removeAllSnackbars(context);
                   if (inFavorites) {

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/screens/about_screen.dart';
 import 'package:nasa_apod/screens/detail_screen.dart';
@@ -51,8 +49,6 @@ void generateMockData() {
           .subtract(Duration(days: index * 2))
           .toIso8601String()));
 
-  AppData mockAppData = AppData(favoriteDates: mockDates);
   // ignore: invalid_use_of_visible_for_testing_member
-  SharedPreferences.setMockInitialValues(
-      {AppStorage.FAVORITES_KEY: jsonEncode(mockAppData)});
+  SharedPreferences.setMockInitialValues({AppStorage.FAVORITES_KEY: mockDates});
 }

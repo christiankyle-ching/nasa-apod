@@ -8,7 +8,11 @@ import 'package:nasa_apod/secrets.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 
 class ApodApi {
-  static DateTime initDate = DateTime.now();
+  static DateTime getInitDate() {
+    DateTime _tmpDate = DateTime.now();
+    return DateTime(_tmpDate.year, _tmpDate.month, _tmpDate.day);
+  }
+
   static DateTimeRange dateRange =
       DateTimeRange(start: DateTime(1995, 6, 16), end: DateTime.now());
 
@@ -53,11 +57,5 @@ class ApodApi {
 
   static String convertUrlToHttp(String url) {
     return url.replaceFirst('https', 'http');
-  }
-
-  static String getYoutubeId(String url) {
-    // Match Youtube ID from Youtube Embed Url
-    RegExp regex = new RegExp(r"embed\/(.*)\?rel");
-    return regex.firstMatch(url).group(1);
   }
 }

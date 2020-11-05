@@ -70,17 +70,14 @@ class _ApodListViewState extends State<ApodListView> {
   }
 
   Widget _buildFavoritesList(BuildContext context) {
-    if (!Provider.of<ApodModel>(context, listen: false).loadedFavorites) {
-      _startLoading();
-      Provider.of<ApodModel>(context, listen: false)
-          .fetchAllFavoriteApods()
-          .whenComplete(() => _endLoading());
-      return Container(); // return nothing, but show snackbar
-    }
-
     return Consumer<ApodModel>(
       builder: (_, apodModel, __) {
-        if (apodModel.favoriteApodDates.length <= 0) {
+        if (!apodModel.loadedFavorites) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (apodModel.loadedFavorites &&
+            apodModel.favoriteApodDates.length <= 0) {
           return Center(
             child: RichText(
               textAlign: TextAlign.center,
