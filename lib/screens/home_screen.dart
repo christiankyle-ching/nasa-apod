@@ -39,49 +39,52 @@ class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
     });
   }
 
+  void _onValueChanged(bool newValue) async {
+    double screenRatio = MediaQuery.of(context).size.height.floor() /
+        MediaQuery.of(context).size.width.floor();
+
+    if (newValue) {
+      bool chosenValue = await showDialog(
+          context: context,
+          barrierDismissible: false,
+          child: AlertDialog(
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context, false);
+                },
+                child: Text('Cancel'),
+              ),
+              RaisedButton(
+                onPressed: () {
+                  AppStorage.setDynamicWallpaper(newValue, screenRatio);
+                  Navigator.pop(context, true);
+                },
+                child: Text('OK'),
+              ),
+            ],
+            content: Text(
+              'This setting will update your wallpaper everyday (starting this day) if it is a photo from NASA.\n\nDo you want to continue?',
+            ),
+          ));
+
+      setState(() {
+        value = chosenValue;
+      });
+    } else {
+      AppStorage.setDynamicWallpaper(newValue, screenRatio);
+      setState(() {
+        value = newValue;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
       title: Text('Daily Wallpaper?'),
       value: value,
-      onChanged: (enabled)
-          ? (bool newValue) async {
-              if (newValue) {
-                bool chosenValue = await showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    child: AlertDialog(
-                      actions: [
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                          },
-                          child: Text('Cancel'),
-                        ),
-                        RaisedButton(
-                          onPressed: () {
-                            AppStorage.setDynamicWallpaper(newValue);
-                            Navigator.pop(context, true);
-                          },
-                          child: Text('OK'),
-                        ),
-                      ],
-                      content: Text(
-                        'This setting will update your wallpaper everyday (starting this day) if it is a photo from NASA.\n\nDo you want to continue?',
-                      ),
-                    ));
-
-                setState(() {
-                  value = chosenValue;
-                });
-              } else {
-                AppStorage.setDynamicWallpaper(newValue);
-                setState(() {
-                  value = newValue;
-                });
-              }
-            }
-          : null,
+      onChanged: (enabled) ? _onValueChanged : null,
     );
   }
 }
@@ -110,10 +113,10 @@ class _AppScaffoldState extends State<AppScaffold> {
   void initState() {
     super.initState();
 
-    _futureHighlightApod = ApodApi.fetchApodByDate(DateTime.now());
-
     // Init Pages
     try {
+      _futureHighlightApod = ApodApi.fetchApodByDate(DateTime.now());
+
       firstPage = DetailScreen(
         key: PageStorageKey('firstPage'),
         futureApod: _futureHighlightApod,

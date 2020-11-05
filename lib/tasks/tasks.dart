@@ -1,4 +1,3 @@
-import 'package:nasa_apod/models/app_storage.dart';
 import 'package:nasa_apod/tasks/wallpaper_task.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -9,7 +8,7 @@ void callbackDispatcher() {
 
     switch (task) {
       case CHANGE_WALLPAPER_TASKNAME:
-        await attemptChangeWallpaper();
+        await attemptChangeWallpaper(inputData['screenRatio']);
         return true;
       default:
         return true;
@@ -22,8 +21,8 @@ void initializeBackgroundTasks() async {
   Workmanager.initialize(
     callbackDispatcher,
     // DEBUG
-    // isInDebugMode: true,
+    isInDebugMode: true,
   );
 
-  updateWallpaperTask(await AppStorage.getDynamicWallpaper());
+  // updateWallpaperTask(await AppStorage.getDynamicWallpaper());
 }

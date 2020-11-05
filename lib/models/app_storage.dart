@@ -55,7 +55,7 @@ class AppStorage {
     final prefs = await SharedPreferences.getInstance();
 
     // Set AppData value encoded to String<Json> to SharedPreferences
-    prefs.setString(AppStorage.FAVORITES_KEY, jsonEncode(appData));
+    await prefs.setString(AppStorage.FAVORITES_KEY, jsonEncode(appData));
   }
 
   static Future<bool> getDynamicWallpaper() async {
@@ -64,11 +64,11 @@ class AppStorage {
     return prefs.getBool(AppStorage._ENABLE_DYNAMIC_WALLPAPER) ?? false;
   }
 
-  static void setDynamicWallpaper(bool newValue) async {
+  static void setDynamicWallpaper(bool newValue, double screenRatio) async {
     final prefs = await SharedPreferences.getInstance();
 
-    prefs.setBool(AppStorage._ENABLE_DYNAMIC_WALLPAPER, newValue);
+    await prefs.setBool(AppStorage._ENABLE_DYNAMIC_WALLPAPER, newValue);
 
-    updateWallpaperTask(newValue);
+    await updateWallpaperTask(newValue, screenRatio);
   }
 }

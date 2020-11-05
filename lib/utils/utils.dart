@@ -161,7 +161,7 @@ Future<String> cacheImage(String mediaUrl, String filename) async {
   final String directory = (await getApplicationDocumentsDirectory()).path;
   final String fileDir = '$directory/$filename';
 
-  // Create new file, then write as bytes
+  // Save image, uncropped
   File imageFile = new File(fileDir);
   imageFile.writeAsBytesSync(response.bodyBytes);
 

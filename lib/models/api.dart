@@ -27,10 +27,7 @@ class ApodApi {
       if (response.statusCode == 200) {
         return Apod.fromJson(jsonDecode(response.body));
       } else {
-        if (response.statusCode == 404) {
-          return Future.error(response.statusCode);
-        }
-        return Future.error(response.statusCode);
+        throw Exception(response.statusCode);
       }
     } on SocketException catch (err) {
       print('NO_INTERNET: $err');

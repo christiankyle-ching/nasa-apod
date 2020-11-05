@@ -97,16 +97,9 @@ class _ApodDetailState extends State<ApodDetail> {
   }
 
   _scrollListener() {
-    if (_scrollController.offset >= 120) {
-      setState(() {
-        isTitleExpanded = false;
-      });
-    } else {
-      setState(() {
-        isTitleExpanded = true;
-      });
-    }
-    print(isTitleExpanded);
+    setState(() {
+      isTitleExpanded = !(_scrollController.offset >= 120);
+    });
   }
 
   @override
@@ -222,7 +215,7 @@ class _ApodDetailState extends State<ApodDetail> {
           child: _title,
         ),
         titlePadding: (widget.noScaffold)
-            ? null
+            ? EdgeInsetsDirectional.only(start: 20, bottom: 16, end: 20)
             : EdgeInsetsDirectional.only(start: 54, bottom: 16, end: 82),
         stretchModes: [StretchMode.zoomBackground, StretchMode.fadeTitle],
         centerTitle: widget.noScaffold,
@@ -247,57 +240,10 @@ class _ApodDetailState extends State<ApodDetail> {
 
   Future<void> _handleOnStretch(BuildContext context, Apod apod) async {
     await Future.delayed(Duration(microseconds: 1));
+
     try {
-      Navigator.pushNamed(context, MediaScreen.routeName, arguments: apod);
-    } catch (_) {
-      print('FAILED_PULL_MEDIA');
-    }
-  }
-}
-
-class MediaAppBar extends StatelessWidget {
-  final bool noScaffold;
-  final Widget title, mediaPreview, favoriteToggle, shareButton;
-  final Apod apod;
-
-  MediaAppBar({
-    @required this.noScaffold,
-    @required this.title,
-    @required this.mediaPreview,
-    @required this.favoriteToggle,
-    @required this.shareButton,
-    @required this.apod,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
-      leading: (noScaffold) ? Container() : null,
-      actions: (!noScaffold) ? [favoriteToggle, shareButton] : [],
-      elevation: 8.0,
-      forceElevated: true,
-      flexibleSpace: FlexibleSpaceBar(
-        background: mediaPreview,
-        title: IgnorePointer(ignoring: true, child: SafeArea(child: title)),
-        titlePadding: (noScaffold)
-            ? null
-            : EdgeInsetsDirectional.only(start: 54, bottom: 16, end: 82),
-        stretchModes: [StretchMode.zoomBackground, StretchMode.fadeTitle],
-        centerTitle: noScaffold,
-      ),
-      expandedHeight: 225,
-      floating: false,
-      pinned: true,
-      stretch: true,
-      stretchTriggerOffset: 125,
-      onStretchTrigger: () => _handleOnStretch(context, apod),
-    );
-  }
-
-  Future<void> _handleOnStretch(BuildContext context, Apod apod) async {
-    await Future.delayed(Duration(microseconds: 1));
-    try {
-      Navigator.pushNamed(context, MediaScreen.routeName, arguments: apod);
+      if (apod.mediaType == MediaType.image)
+        Navigator.pushNamed(context, MediaScreen.routeName, arguments: apod);
     } catch (_) {
       print('FAILED_PULL_MEDIA');
     }
@@ -313,19 +259,22 @@ class FavoriteToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ApodModel>(builder: (_, apodModel, __) {
       bool inFavorites = apodModel.favoriteApodDates.contains(apod.date);
+      bool enable = apodModel.loadedFavorites;
 
       return IconButton(
           icon: Icon((inFavorites) ? Icons.star : Icons.star_border),
-          onPressed: () {
-            removeAllSnackbars(context);
-            if (inFavorites) {
-              apodModel.removeFavorite(apod.date);
-              showSnackbar(context, 'Removed ${apod.title} to favorites');
-            } else {
-              apodModel.addFavorite(apod.date, apod);
-              showSnackbar(context, 'Added ${apod.title} to favorites');
-            }
-          },
+          onPressed: (enable)
+              ? () {
+                  removeAllSnackbars(context);
+                  if (inFavorites) {
+                    apodModel.removeFavorite(apod.date);
+                    showSnackbar(context, 'Removed ${apod.title} to favorites');
+                  } else {
+                    apodModel.addFavorite(apod.date, apod);
+                    showSnackbar(context, 'Added ${apod.title} to favorites');
+                  }
+                }
+              : null,
           color: (inFavorites) ? Colors.yellow : null);
     });
   }
