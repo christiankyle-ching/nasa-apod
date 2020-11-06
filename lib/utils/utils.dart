@@ -58,6 +58,11 @@ bool isDateWithinRange(DateTimeRange range, DateTime date) {
       (date.isAtSameMomentAs(range.start) || date.isAtSameMomentAs(range.end)));
 }
 
+double getScreenRatio(BuildContext context) {
+  return MediaQuery.of(context).size.height.floor() /
+      MediaQuery.of(context).size.width.floor();
+}
+
 // Widgets
 Widget buildMediaPreview(
     BuildContext context, MediaType mediaType, String url) {
@@ -83,7 +88,6 @@ class _ImagePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Loading image from: $url');
     return Image.network(
       url,
       loadingBuilder: (_, Widget child, ImageChunkEvent isLoading) {

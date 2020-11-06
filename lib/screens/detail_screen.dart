@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nasa_apod/models/apod_model.dart';
+import 'package:nasa_apod/screens/media_screen.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -35,22 +36,19 @@ class DetailScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            if (snapshot.error.runtimeType == SocketException)
-              throw (snapshot.error);
-            if (snapshot.error == 404) {
-              return Center(
-                child: Text(
-                    'No Available APoD for ${DateFormat.yMMMMd().format(DateTime.now())} (today)'),
-              );
-            }
-            return Center(
-              child: Text('An error has occured with code: ${snapshot.error}'),
-            );
+            throw (snapshot.error);
           }
         } on SocketException catch (_) {
           showNoInternetError(context);
-        } catch (err) {
-          print(err);
+        } on Exception catch (_) {
+          return Center(
+            child: Text(
+                'No Available APoD for ${DateFormat.yMMMMd().format(DateTime.now())} (today)'),
+          );
+        } catch (error) {
+          return Center(
+            child: Text('An unknown error has occured: $error'),
+          );
         }
 
         return Center(
@@ -277,29 +275,6 @@ class FavoriteToggle extends StatelessWidget {
               : null,
           color: (inFavorites) ? Colors.yellow : null);
     });
-  }
-}
-
-class MediaScreen extends StatelessWidget {
-  static const String routeName = '/detail/media';
-
-  @override
-  Widget build(BuildContext context) {
-    final Apod apod = ModalRoute.of(context).settings.arguments;
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context);
-      },
-      child: Scaffold(
-          body: Container(
-        child: Center(
-          child: Hero(
-              tag: 'apodMedia${apod.title}',
-              child: buildMediaPreview(context, apod.mediaType, apod.url)),
-        ),
-      )),
-    );
   }
 }
 

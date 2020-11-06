@@ -1,5 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+enum NotificationChannel {
+  wallpaperUpdates,
+}
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -39,15 +43,22 @@ Future onDidReceiveLocalNotification(
   */
 }
 
-void sendNotification(String title, String message) async {
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails('com.ckchingdev.nasa_apod',
-          'nasa-apod-channel', 'Notifications for NASA APoD',
+void sendNotification(
+  NotificationChannel channel,
+  String title,
+  String message,
+) async {
+  String channelId = 'com.ckchingdev.nasa_apod_$channel';
+
+  AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+          channelId, 'Wallpaper Updates', 'For wallpaper updates and changes',
           importance: Importance.max,
           priority: Priority.high,
           ticker: 'ticker');
-  const NotificationDetails platformChannelSpecifics =
+  NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
+
   await flutterLocalNotificationsPlugin.show(
       0, title, message, platformChannelSpecifics);
 }

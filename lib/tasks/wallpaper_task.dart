@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/apod_model.dart';
+import 'package:nasa_apod/models/app_storage.dart';
 import 'package:nasa_apod/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wallpaper_manager/wallpaper_manager.dart';
@@ -17,7 +18,7 @@ const String CHANGE_WALLPAPER_TASKNAME = 'changeWallpaperTask';
 const String WALLPAPER_CACHE_FILENAME = 'dynamic_wallpaper.png';
 const String LAST_WALLPAPER_UPDATE_KEY = 'lastWallpaperUpdate';
 // DEBUG: change frequency duration. 15 minutes only for debugging
-const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 15;
+const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 60;
 
 Future<void> updateWallpaperTask(bool enable, double screenRatio) async {
   if (enable) {
@@ -43,9 +44,6 @@ Future<void> attemptChangeWallpaper(double screenRatio) async {
   DateTime dateToday = _getDateToday();
   DateTime _lastLoadedDate = await getLastWallpaperDate();
 
-  // DEBUG
-  print('BEFORE_ATTEMPT - Last Loaded Date: $_lastLoadedDate');
-
   if (dateToday != _lastLoadedDate) {
     try {
       Apod apod = await ApodApi.fetchApodByDate(dateToday);
@@ -54,43 +52,34 @@ Future<void> attemptChangeWallpaper(double screenRatio) async {
         case MediaType.image:
           try {
             await changeWallpaper(apod, screenRatio);
-            print('CHANGE_WALLPAPER_SUCCESS');
-            sendNotification(
+            await _setLastWallpaperDate(apod.date);
+            sendNotification(NotificationChannel.wallpaperUpdates,
                 NOTIFICATION_TITLE, 'Wallpaper has been set to ${apod.title}');
           } catch (err) {
-            // DEBUG
-            print('CHANGE_WALLPAPER_ERROR');
-            sendNotification(NOTIFICATION_TITLE, 'Error while setting image');
+            sendNotification(NotificationChannel.wallpaperUpdates,
+                NOTIFICATION_TITLE, 'Error while changing wallpaper');
           }
           break;
 
         // If apod today is video, skip
         case MediaType.video:
           await _setLastWallpaperDate(apod.date);
-          print('CHANGE_WALLPAPER_SKIPPED');
-          // DEBUG
-          sendNotification(NOTIFICATION_TITLE, 'APOD is video. SKIPPING');
+          sendNotification(
+              NotificationChannel.wallpaperUpdates,
+              NOTIFICATION_TITLE,
+              'APOD for today is video, and cannot be set as wallpaper.');
           break;
       }
-    } catch (err) {
-      // DEBUG
-      print('CHANGE_WALLPAPER_API_ERROR');
-      sendNotification(NOTIFICATION_TITLE, 'Problem fetching Apod from API');
-    }
-  } else {
-    // if last loaded date is today, already done
-    print('CHANGE_WALLPAPER_ALREADY_DONE');
-
-    // DEBUG
-    sendNotification(
-        NOTIFICATION_TITLE, 'Changed Wallpaper Already for this day');
+    } catch (err) {}
   }
 }
 
 Future<void> changeWallpaper(Apod apod, double screenRatio) async {
   try {
     // Download image, get file path
-    String fileDir = await cacheImage(apod.url, WALLPAPER_CACHE_FILENAME);
+    String downloadUrl =
+        (await AppStorage.getHdSetting()) ? apod.hdurl : apod.url;
+    String fileDir = await cacheImage(downloadUrl, WALLPAPER_CACHE_FILENAME);
 
     // Crop image
     File imageFile = File(fileDir);
@@ -105,17 +94,19 @@ Future<void> changeWallpaper(Apod apod, double screenRatio) async {
     int right = widthMid + widthOffset;
 
     // DEBUG
-    // print('Image Height: ${decodedImage.height}');
-    // print('Image Width: ${decodedImage.width}');
-    // print('Image Middle: $widthMid');
-    // print('Left: $left');
-    // print('Right: $right');
+    print('Image Height: ${decodedImage.height}');
+    print('Image Width: ${decodedImage.width}');
+    print('Image Middle: $widthMid');
+    print('Top: $top');
+    print('Bottom: $bottom');
+    print('Left: $left');
+    print('Right: $right');
+
+    print(imageFile);
 
     // Set Wallpaper
     await WallpaperManager.setWallpaperFromFileWithCrop(
         fileDir, WallpaperManager.HOME_SCREEN, left, top, right, bottom);
-
-    await _setLastWallpaperDate(apod.date);
   } catch (_) {
     rethrow;
   }

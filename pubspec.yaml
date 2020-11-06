@@ -36,11 +36,11 @@ dependencies:
   transparent_image: ^1.0.0
   intl: ^0.16.1
   shared_preferences: ^0.5.12
-  url_launcher: ^5.7.5
+  url_launcher: ^5.7.10
   share: '>=0.6.5+4 <2.0.0'
   path_provider: 1.6.22
   workmanager: ^0.2.0
-  wallpaper_manager: 1.0.10
+  wallpaper_manager: ^1.0.10
   flutter_local_notifications: 3.0.1+2
 
 dev_dependencies:

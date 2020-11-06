@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/screens/about_screen.dart';
 import 'package:nasa_apod/screens/detail_screen.dart';
+import 'package:nasa_apod/screens/media_screen.dart';
 import 'package:nasa_apod/tasks/notifications.dart';
 import 'package:nasa_apod/tasks/tasks.dart';
 import 'package:nasa_apod/theme/theme.dart';

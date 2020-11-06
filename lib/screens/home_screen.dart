@@ -12,8 +12,7 @@ import 'package:provider/provider.dart';
 import 'detail_screen.dart';
 import 'favorites_screen.dart';
 
-// Global Widgets
-
+// Settings
 class DailyWallpaperSetting extends StatefulWidget {
   DailyWallpaperSetting({Key key}) : super(key: key);
 
@@ -32,22 +31,21 @@ class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
   }
 
   void initValue() async {
-    bool setting = await AppStorage.getDynamicWallpaper();
+    value = await AppStorage.getDynamicWallpaper();
     setState(() {
-      value = setting;
       enabled = true;
     });
   }
 
   void _onValueChanged(bool newValue) async {
-    double screenRatio = MediaQuery.of(context).size.height.floor() /
-        MediaQuery.of(context).size.width.floor();
+    double screenRatio = getScreenRatio(context);
 
     if (newValue) {
       bool chosenValue = await showDialog(
           context: context,
           barrierDismissible: false,
           child: AlertDialog(
+            title: Text('Enable Daily Wallpaper?'),
             actions: [
               FlatButton(
                 onPressed: () {
@@ -82,13 +80,54 @@ class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
-      title: Text('Daily Wallpaper?'),
+      title: Text('Daily Wallpaper'),
       value: value,
       onChanged: (enabled) ? _onValueChanged : null,
     );
   }
 }
 
+class UseHDForDownloadsSetting extends StatefulWidget {
+  @override
+  _UseHDForDownloadsSettingState createState() =>
+      _UseHDForDownloadsSettingState();
+}
+
+class _UseHDForDownloadsSettingState extends State<UseHDForDownloadsSetting> {
+  bool value = false;
+  bool enabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initValue();
+  }
+
+  void initValue() async {
+    value = await AppStorage.getHdSetting();
+    setState(() {
+      enabled = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      value: value,
+      onChanged: (enabled)
+          ? (newValue) {
+              AppStorage.setHdSetting(newValue);
+              setState(() {
+                value = newValue;
+              });
+            }
+          : null,
+      title: Text('Use HD in wallpaper'),
+    );
+  }
+}
+
+// Global Widgets
 class AppScaffold extends StatefulWidget {
   static const String routeName = '/';
 
@@ -172,9 +211,12 @@ class _AppScaffoldState extends State<AppScaffold> {
         child: ListView(
           children: [
             AppDrawerHeader(),
+            DrawerSectionTitle('Settings'),
             DailyWallpaperSetting(
               key: ValueKey('dailyWallpaperSetting'),
             ),
+            UseHDForDownloadsSetting(),
+            DrawerSectionTitle('Other'),
             ListTile(
               leading: Icon(Icons.info),
               title: Text('About'),
@@ -227,6 +269,31 @@ class _AppScaffoldState extends State<AppScaffold> {
         currentIndex: _currentTab,
         onTap: _onItemTapped,
       ),
+    );
+  }
+}
+
+class DrawerSectionTitle extends StatelessWidget {
+  final String title;
+
+  DrawerSectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, top: 16),
+          child: Text(
+            title,
+            style: appTheme.textTheme.subtitle2.copyWith(
+              color: appTheme.textTheme.subtitle2.color.withOpacity(0.6),
+            ),
+          ),
+        ),
+        Divider(),
+      ],
     );
   }
 }
