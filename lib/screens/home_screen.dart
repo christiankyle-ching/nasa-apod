@@ -288,7 +288,7 @@ class DrawerSectionTitle extends StatelessWidget {
           child: Text(
             title,
             style: appTheme.textTheme.subtitle2.copyWith(
-              color: appTheme.textTheme.subtitle2.color.withOpacity(0.6),
+              color: Colors.white70,
             ),
           ),
         ),

@@ -16,7 +16,11 @@ class AboutScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
-          icon: Image.asset('images/icons/github.png'),
+          icon: Image.asset(
+            'images/icons/github.png',
+            height: 22,
+            width: 22,
+          ),
           onPressed: () => launchUrl(context, githubUrl),
         ),
         IconButton(
@@ -48,17 +52,7 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget flutterFooter = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('Powered with Flutter ', style: footerStyle),
-        Image.asset(
-          'images/icons/flutter.png',
-          height: footerStyle.fontSize,
-        )
-      ],
-    );
-
+    // App-related Information
     final Widget appLogo = SizedBox(
       height: appTheme.textTheme.headline1.fontSize,
       child: Image.asset('images/icons/logo.png'),
@@ -93,36 +87,63 @@ class AboutScreen extends StatelessWidget {
       ],
     );
 
+    // Footer Widgets
+    final Widget flutterFooter = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Built with Flutter\u2122 ', style: footerStyle),
+        Image.asset(
+          'images/icons/flutter.png',
+          height: footerStyle.fontSize,
+        )
+      ],
+    );
+    Widget flutterDisclaimer = Text(
+      'Flutter and the related logo are trademarks of Google LLC. We are not endorsed by or affiliated with Google LLC.',
+      textAlign: TextAlign.center,
+      style: footerStyle.copyWith(
+        fontSize: 8,
+        fontWeight: FontWeight.normal,
+        color: Colors.white70,
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('About'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    appLogo,
-                    SizedBox(height: 32),
-                    appTitle,
-                    SizedBox(height: 8),
-                    appDescription,
-                    SizedBox(height: 32),
-                    appDeveloper,
-                    appDeveloperLinks(context),
-                  ],
-                ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  appLogo,
+                  SizedBox(height: 32),
+                  appTitle,
+                  SizedBox(height: 8),
+                  appDescription,
+                  SizedBox(height: 32),
+                  appDeveloper,
+                  appDeveloperLinks(context),
+                ],
               ),
             ),
-            flutterFooter,
-            githubFooter(context),
-          ],
-        ),
+          ),
+          Divider(height: 0),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                flutterFooter,
+                githubFooter(context),
+                flutterDisclaimer,
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
