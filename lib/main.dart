@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/screens/about_screen.dart';
 import 'package:nasa_apod/screens/detail_screen.dart';
@@ -11,6 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models/apod_model.dart';
 import 'models/app_storage.dart';
 import 'screens/home_screen.dart';
+
+FirebaseAnalytics analytics = FirebaseAnalytics();
 
 void main() {
   // DEBUG: Generate random data
@@ -37,6 +41,9 @@ class MainApp extends StatelessWidget {
         MediaScreen.routeName: (context) => MediaScreen(),
         AboutScreen.routeName: (context) => AboutScreen(),
       },
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
     );
   }
 }
