@@ -17,14 +17,14 @@ class DetailScreen extends StatelessWidget {
   DetailScreen({Key key, this.futureApod}) : super(key: key);
 
   Widget _buildFromInstance(Apod apod) {
-    print('Detail Screen using instance of Apod');
+    // print('Detail Screen using instance of Apod');
     return Scaffold(
       body: ApodDetail(apod: apod),
     );
   }
 
   Widget _buildFromFuture(Future<Apod> apod) {
-    print('Detail Screen using a FutureBuilder of Apod');
+    // print('Detail Screen using a FutureBuilder of Apod');
 
     return FutureBuilder(
       future: apod,
@@ -41,9 +41,12 @@ class DetailScreen extends StatelessWidget {
         } on SocketException catch (_) {
           showNoInternetError(context);
         } on Exception catch (_) {
-          return Center(
-            child: Text(
-                'No Available APoD for ${DateFormat.yMMMMd().format(DateTime.now())} (today)'),
+          return Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(
+              child: Text(
+                  'No Available APoD for ${DateFormat.yMMMMd().format(DateTime.now())} (today)'),
+            ),
           );
         } catch (error) {
           return Center(

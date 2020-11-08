@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
   static const String routeName = '/about';
@@ -88,15 +89,18 @@ class AboutScreen extends StatelessWidget {
     );
 
     // Footer Widgets
-    final Widget flutterFooter = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('Built with Flutter\u2122 ', style: footerStyle),
-        Image.asset(
-          'images/icons/flutter.png',
-          height: footerStyle.fontSize,
-        )
-      ],
+    final Widget flutterFooter = GestureDetector(
+      onTap: () => launchUrl(context, 'https://flutter.dev/'),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Built with Flutter\u2122 ', style: footerStyle),
+          Image.asset(
+            'images/icons/flutter.png',
+            height: footerStyle.fontSize,
+          )
+        ],
+      ),
     );
     Widget flutterDisclaimer = Text(
       'Flutter and the related logo are trademarks of Google LLC. We are not endorsed by or affiliated with Google LLC.',
@@ -116,19 +120,22 @@ class AboutScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: Center(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  appLogo,
-                  SizedBox(height: 32),
-                  appTitle,
-                  SizedBox(height: 8),
-                  appDescription,
-                  SizedBox(height: 32),
-                  appDeveloper,
-                  appDeveloperLinks(context),
-                ],
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    appLogo,
+                    SizedBox(height: 32),
+                    appTitle,
+                    SizedBox(height: 8),
+                    appDescription,
+                    SizedBox(height: 32),
+                    appDeveloper,
+                    appDeveloperLinks(context),
+                  ],
+                ),
               ),
             ),
           ),
@@ -138,7 +145,8 @@ class AboutScreen extends StatelessWidget {
             child: Column(
               children: [
                 flutterFooter,
-                githubFooter(context),
+                SizedBox(height: 8),
+                // githubFooter(context),
                 flutterDisclaimer,
               ],
             ),

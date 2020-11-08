@@ -12,22 +12,22 @@ class MediaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final Apod apod = ModalRoute.of(context).settings.arguments;
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context);
-      },
-      child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            actions: [SetWallpaperButton(apod: apod)],
-          ),
-          body: Container(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        actions: [SetWallpaperButton(apod: apod)],
+      ),
+      body: SafeArea(
+        child: InteractiveViewer(
+          child: Container(
             child: Center(
               child: Hero(
                   tag: 'apodMedia${apod.title}',
                   child: buildMediaPreview(context, apod.mediaType, apod.url)),
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -59,8 +59,8 @@ bool isDateWithinRange(DateTimeRange range, DateTime date) {
 }
 
 double getScreenRatio(BuildContext context) {
-  return MediaQuery.of(context).size.height.floor() /
-      MediaQuery.of(context).size.width.floor();
+  return MediaQuery.of(context).size.width.floor() /
+      MediaQuery.of(context).size.height.floor();
 }
 
 // Widgets

@@ -8,10 +8,15 @@ void callbackDispatcher() {
 
     switch (task) {
       case CHANGE_WALLPAPER_TASKNAME:
-        await attemptChangeWallpaper(inputData['screenRatio']);
-        return true;
+        try {
+          await attemptChangeWallpaper(inputData['screenRatio']);
+          return Future.value(true);
+        } catch (err) {
+          return Future.value(false);
+        }
+        break;
       default:
-        return true;
+        return Future.value(true);
     }
   });
 }
@@ -21,6 +26,6 @@ void initializeBackgroundTasks() async {
   Workmanager.initialize(
     callbackDispatcher,
     // DEBUG: change to false on production
-    isInDebugMode: false,
+    isInDebugMode: true,
   );
 }

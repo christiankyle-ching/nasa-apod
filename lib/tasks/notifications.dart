@@ -48,13 +48,13 @@ void sendNotification(
   String title,
   String message,
 ) async {
-  String channelId = 'com.ckchingdev.nasa_apod_$channel';
+  String channelId = 'com.ckchingdev.apod$channel';
 
   AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
           channelId, 'Wallpaper Updates', 'For wallpaper updates and changes',
-          importance: Importance.max,
-          priority: Priority.high,
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
           ticker: 'ticker');
   NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);

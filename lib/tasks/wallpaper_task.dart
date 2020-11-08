@@ -17,22 +17,30 @@ const String CHANGE_WALLPAPER_UNIQUE_NAME = 'changeWallpaperTask';
 const String CHANGE_WALLPAPER_TASKNAME = 'changeWallpaperTask';
 const String WALLPAPER_CACHE_FILENAME = 'dynamic_wallpaper.png';
 const String LAST_WALLPAPER_UPDATE_KEY = 'lastWallpaperUpdate';
-// DEBUG: change frequency duration. 15 minutes only for debugging
-const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 60;
+// DEBUG: change frequency duration
+const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 30;
 
 Future<void> updateWallpaperTask(bool enable, double screenRatio) async {
   if (enable) {
     print('CHANGE_WALLPAPER_TASK_START');
-    Workmanager.registerPeriodicTask(
+    await Workmanager.registerPeriodicTask(
       CHANGE_WALLPAPER_UNIQUE_NAME,
       CHANGE_WALLPAPER_TASKNAME,
       existingWorkPolicy: ExistingWorkPolicy.replace,
+      backoffPolicy: BackoffPolicy.linear,
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresDeviceIdle: false,
+        requiresStorageNotLow: false,
+      ),
       frequency: Duration(minutes: DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES),
       inputData: {'screenRatio': screenRatio},
     );
   } else {
     print('CHANGE_WALLPAPER_TASK_CLEAR');
-    Workmanager.cancelByUniqueName(CHANGE_WALLPAPER_UNIQUE_NAME);
+    await Workmanager.cancelByUniqueName(CHANGE_WALLPAPER_UNIQUE_NAME);
 
     await _setLastWallpaperDate(ApodApi.dateRange.start);
   }
@@ -70,7 +78,9 @@ Future<void> attemptChangeWallpaper(double screenRatio) async {
               'APOD for today is video, and cannot be set as wallpaper.');
           break;
       }
-    } catch (err) {}
+    } catch (err) {
+      rethrow;
+    }
   }
 }
 
@@ -86,7 +96,7 @@ Future<void> changeWallpaper(Apod apod, double screenRatio) async {
     var decodedImage = await decodeImageFromList(imageFile.readAsBytesSync());
 
     int widthMid = (decodedImage.width / 2).floor();
-    int widthOffset = ((decodedImage.width / screenRatio) / 2).floor();
+    int widthOffset = ((decodedImage.height * screenRatio) / 2).floor();
 
     int top = 0;
     int bottom = decodedImage.height;
@@ -94,6 +104,7 @@ Future<void> changeWallpaper(Apod apod, double screenRatio) async {
     int right = widthMid + widthOffset;
 
     // DEBUG
+    print('Screen Ratio: $screenRatio');
     print('Image Height: ${decodedImage.height}');
     print('Image Width: ${decodedImage.width}');
     print('Image Middle: $widthMid');
