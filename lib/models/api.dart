@@ -3,14 +3,45 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:nasa_apod/secrets.dart';
 
 import 'package:nasa_apod/models/apod_model.dart';
 
 class ApodApi {
+  static DateTime _now = DateTime.now();
+  static DateTime _localNow = DateTime(_now.year, _now.month, _now.day);
+  static DateTime _localTomorrow = _localNow.add(Duration(days: 1));
+
   static DateTime getInitDate() {
     DateTime _tmpDate = DateTime.now();
     return DateTime(_tmpDate.year, _tmpDate.month, _tmpDate.day);
+  }
+
+  static DateTime _getNextUpdateTime() {
+    // Calculate offset between EST and Local
+    Duration estOffset = _now.timeZoneOffset - Duration(hours: -5);
+
+    // Subtract Local time to offset to get EST
+    DateTime est = _now.subtract(estOffset);
+
+    // Get EST tomorrow, then set midnight
+    DateTime estTomorrow = est.add(Duration(days: 1));
+    DateTime estMidnight =
+        DateTime(estTomorrow.year, estTomorrow.month, estTomorrow.day);
+
+    // Add offset back to get update time in local timezone
+    return estMidnight.add(estOffset);
+  }
+
+  static String getNextUpdateTimeString() {
+    DateTime _updateDateTime = _getNextUpdateTime();
+
+    String day = '';
+    day += (_updateDateTime.isAfter(_localTomorrow)) ? 'Tomorrow' : 'Today';
+    day += ' (${DateFormat('EEEE').format(_updateDateTime)})';
+
+    return '$day, some time after ${DateFormat('jm').format(_updateDateTime)}';
   }
 
   static DateTimeRange dateRange =

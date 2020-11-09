@@ -52,10 +52,14 @@ void sendNotification(
 
   AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-          channelId, 'Wallpaper Updates', 'For wallpaper updates and changes',
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
-          ticker: 'ticker');
+    channelId,
+    'Wallpaper Updates',
+    'For wallpaper updates and changes',
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    ticker: 'ticker',
+    visibility: NotificationVisibility.public,
+  );
   NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 

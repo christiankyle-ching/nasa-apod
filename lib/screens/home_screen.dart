@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/models/app_storage.dart';
@@ -81,6 +82,9 @@ class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
   Widget build(BuildContext context) {
     return SwitchListTile(
       title: Text('Daily Wallpaper'),
+      subtitle: Text(
+        ApodApi.getNextUpdateTimeString(),
+      ),
       value: value,
       onChanged: (enabled) ? _onValueChanged : null,
     );
@@ -122,7 +126,8 @@ class _UseHDForDownloadsSettingState extends State<UseHDForDownloadsSetting> {
               });
             }
           : null,
-      title: Text('Use HD in wallpaper'),
+      title: Text('HD Wallpapers'),
+      subtitle: Text('Uses more data'),
     );
   }
 }

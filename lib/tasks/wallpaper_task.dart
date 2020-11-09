@@ -18,7 +18,7 @@ const String CHANGE_WALLPAPER_TASKNAME = 'changeWallpaperTask';
 const String WALLPAPER_CACHE_FILENAME = 'dynamic_wallpaper.png';
 const String LAST_WALLPAPER_UPDATE_KEY = 'lastWallpaperUpdate';
 // DEBUG: change frequency duration
-const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 30;
+const int DYNAMIC_WALLPAPER_CHECK_FREQUENCY_MINUTES = 45;
 
 Future<void> updateWallpaperTask(bool enable, double screenRatio) async {
   if (enable) {
@@ -75,7 +75,7 @@ Future<void> attemptChangeWallpaper(double screenRatio) async {
           sendNotification(
               NotificationChannel.wallpaperUpdates,
               NOTIFICATION_TITLE,
-              'APOD for today is video, and cannot be set as wallpaper.');
+              'APOD for today is a video, and cannot be set as wallpaper.');
           break;
       }
     } catch (err) {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/screens/media_screen.dart';
 import 'package:nasa_apod/theme/theme.dart';
@@ -26,6 +27,13 @@ class DetailScreen extends StatelessWidget {
   Widget _buildFromFuture(Future<Apod> apod) {
     // print('Detail Screen using a FutureBuilder of Apod');
 
+    String nextUpdateString =
+        ApodApi.getNextUpdateTimeString().replaceFirst('T', 't');
+
+    String errorMessage = 'No Available APOD for '
+        '${DateFormat.yMMMMd().format(DateTime.now())} (today)\n\n'
+        'Next update $nextUpdateString';
+
     return FutureBuilder(
       future: apod,
       builder: (context, snapshot) {
@@ -45,7 +53,9 @@ class DetailScreen extends StatelessWidget {
             padding: EdgeInsets.all(32),
             child: Center(
               child: Text(
-                  'No Available APoD for ${DateFormat.yMMMMd().format(DateTime.now())} (today)'),
+                errorMessage,
+                textAlign: TextAlign.center,
+              ),
             ),
           );
         } catch (error) {
@@ -142,7 +152,7 @@ class _ApodDetailState extends State<ApodDetail> {
             arguments: widget.apod);
       },
       child: Hero(
-        tag: 'apodMedia${widget.apod.title}',
+        tag: 'apodMediaTag-${widget.apod.date}',
         child: Container(
           constraints: BoxConstraints(
             maxHeight: imageMaxHeight,
@@ -207,7 +217,7 @@ class _ApodDetailState extends State<ApodDetail> {
     Widget mediaAppBar = SliverAppBar(
       leading: (widget.noScaffold) ? Container() : null,
       actions: (!widget.noScaffold) ? [_favoriteToggle, _shareButton] : [],
-      elevation: 8.0,
+      elevation: 4.0,
       forceElevated: true,
       flexibleSpace: FlexibleSpaceBar(
         background: _mediaPreview,
@@ -225,7 +235,7 @@ class _ApodDetailState extends State<ApodDetail> {
       floating: false,
       pinned: true,
       stretch: true,
-      stretchTriggerOffset: 125,
+      stretchTriggerOffset: 150,
       onStretchTrigger: () => _handleOnStretch(context, widget.apod),
     );
 

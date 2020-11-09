@@ -14,16 +14,20 @@ class MediaScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        // backgroundColor: Colors.transparent,
         actions: [SetWallpaperButton(apod: apod)],
       ),
       body: SafeArea(
         child: InteractiveViewer(
           child: Container(
             child: Center(
-              child: Hero(
-                  tag: 'apodMedia${apod.title}',
-                  child: buildMediaPreview(context, apod.mediaType, apod.url)),
+              child: Container(
+                width: double.infinity,
+                child: Hero(
+                    tag: 'apodMediaTag-${apod.date}',
+                    child:
+                        buildMediaPreview(context, apod.mediaType, apod.url)),
+              ),
             ),
           ),
         ),

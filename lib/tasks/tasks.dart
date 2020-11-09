@@ -25,7 +25,7 @@ void callbackDispatcher() {
 void initializeBackgroundTasks() async {
   Workmanager.initialize(
     callbackDispatcher,
-    // DEBUG: change to false on production
-    isInDebugMode: true,
+    // DEBUG: change to false or comment on production
+    // isInDebugMode: true,
   );
 }

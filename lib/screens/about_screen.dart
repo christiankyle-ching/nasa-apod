@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
   static const String routeName = '/about';

@@ -154,7 +154,7 @@ class ApodListTile extends StatelessWidget {
             children: [
               // Background Image / Video
               Hero(
-                tag: 'apodMedia${apod.title}',
+                tag: 'apodMediaTag-${apod.date}',
                 child: Container(
                   width: double.infinity,
                   height: double.infinity,

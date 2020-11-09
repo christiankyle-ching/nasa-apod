@@ -22,7 +22,8 @@ final AlertDialog _dialogNoInternet = AlertDialog(
 
 void showNoInternetError(BuildContext context) async {
   await Future.delayed(Duration(microseconds: 1));
-  showDialog(context: context, child: _dialogNoInternet);
+  showDialog(
+      context: context, child: _dialogNoInternet, barrierDismissible: false);
 }
 
 // Snackbars
