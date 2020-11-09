@@ -345,7 +345,7 @@ class _ShareButtonState extends State<ShareButton> {
           [fileDir],
           subject: "NASA's Photo of the Day",
           text:
-              "Check out this photo of ${widget.title} taken on ${widget.date}",
+              "NASA's Astronomy Picture for ${DateFormat.yMMMMd().format(widget.date)}: ${widget.title}",
         );
       } catch (_) {}
 
@@ -360,7 +360,11 @@ class _ShareButtonState extends State<ShareButton> {
       setState(() {
         _isLoading = true;
       });
-      Share.share(this.widget.mediaUrl, subject: "NASA's Photo of the Day");
+      Share.share(
+        "NASA's Video of the Day for ${DateFormat.yMMMMd().format(widget.date)}: " +
+            this.widget.mediaUrl,
+        subject: "NASA's Video of the Day",
+      );
       setState(() {
         _isLoading = false;
       });

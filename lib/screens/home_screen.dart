@@ -145,7 +145,6 @@ class _DailyWallpaperLocationSettingState
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initValue();
   }
