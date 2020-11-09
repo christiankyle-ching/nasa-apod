@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // References
 final Map<String, Color> _colors = {
+  'primaryLight': _hexColor('7dadff'),
   'primary': _hexColor('0b3d91'),
   'primaryVariant': _hexColor('001862'),
   'secondary': _hexColor('fc3d21'),
@@ -48,7 +49,12 @@ final ThemeData appTheme = ThemeData.dark().copyWith(
   ),
   buttonTheme: ButtonThemeData(
     buttonColor: _colors['secondary'],
-    textTheme: ButtonTextTheme.accent,
+    textTheme: ButtonTextTheme.normal,
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: ButtonStyle(
+      foregroundColor: MaterialStateProperty.all(_colors['primaryLight']),
+    ),
   ),
   snackBarTheme: SnackBarThemeData(
     contentTextStyle: Typography.englishLike2018.bodyText2.apply(

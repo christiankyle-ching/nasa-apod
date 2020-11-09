@@ -59,7 +59,8 @@ Future<void> attemptChangeWallpaper(double screenRatio) async {
       switch (apod.mediaType) {
         case MediaType.image:
           try {
-            await changeWallpaper(apod, screenRatio);
+            int location = await AppStorage.getDailyWallpaperLocation();
+            await changeWallpaper(apod, screenRatio, location);
             await _setLastWallpaperDate(apod.date);
             sendNotification(NotificationChannel.wallpaperUpdates,
                 NOTIFICATION_TITLE, 'Wallpaper has been set to ${apod.title}');
@@ -84,7 +85,8 @@ Future<void> attemptChangeWallpaper(double screenRatio) async {
   }
 }
 
-Future<void> changeWallpaper(Apod apod, double screenRatio) async {
+Future<void> changeWallpaper(
+    Apod apod, double screenRatio, int wallpaperLocation) async {
   try {
     // Download image, get file path
     String downloadUrl =
@@ -117,7 +119,7 @@ Future<void> changeWallpaper(Apod apod, double screenRatio) async {
 
     // Set Wallpaper
     await WallpaperManager.setWallpaperFromFileWithCrop(
-        fileDir, WallpaperManager.HOME_SCREEN, left, top, right, bottom);
+        fileDir, wallpaperLocation, left, top, right, bottom);
   } catch (_) {
     rethrow;
   }

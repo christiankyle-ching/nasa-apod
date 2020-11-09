@@ -4,6 +4,7 @@ import 'package:nasa_apod/models/app_storage.dart';
 import 'package:nasa_apod/tasks/notifications.dart';
 import 'package:nasa_apod/tasks/wallpaper_task.dart';
 import 'package:nasa_apod/utils/utils.dart';
+import 'package:wallpaper_manager/wallpaper_manager.dart';
 
 class MediaScreen extends StatelessWidget {
   static const String routeName = '/detail/media';
@@ -14,7 +15,6 @@ class MediaScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        // backgroundColor: Colors.transparent,
         actions: [SetWallpaperButton(apod: apod)],
       ),
       body: SafeArea(
@@ -51,7 +51,7 @@ class SetWallpaperButton extends StatelessWidget {
           child: AlertDialog(
             title: Text('Set image as wallpaper?'),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text('Close'),
               ),
@@ -97,41 +97,72 @@ class _SetWallpaperConfirmButtonState extends State<SetWallpaperConfirmButton> {
 
   @override
   Widget build(BuildContext context) {
-    double screenRatio = getScreenRatio(context);
-
     return RaisedButton(
       onPressed: (!done)
           ? () async {
-              showDialog(
-                  context: context,
-                  child: loadingDialog,
-                  barrierDismissible: false);
+              int wallpaperLocation = await showDialog(
+                context: context,
+                child: SimpleDialog(
+                  title: Text('Set Wallpaper'),
+                  children: [
+                    TextButton.icon(
+                      onPressed: () =>
+                          Navigator.pop(context, WallpaperManager.HOME_SCREEN),
+                      icon: Icon(Icons.home),
+                      label: Text('Home Screen'),
+                    ),
+                    TextButton.icon(
+                      onPressed: () =>
+                          Navigator.pop(context, WallpaperManager.LOCK_SCREEN),
+                      icon: Icon(Icons.lock),
+                      label: Text('Lock Screen'),
+                    ),
+                    TextButton.icon(
+                      onPressed: () =>
+                          Navigator.pop(context, WallpaperManager.BOTH_SCREENS),
+                      icon: Icon(Icons.phone_android),
+                      label: Text('Home Screen and lock screen'),
+                    ),
+                  ],
+                ),
+              );
 
-              changeWallpaper(widget.apod, screenRatio).then((_) {
-                AppStorage.setDynamicWallpaper(false, screenRatio);
-                sendNotification(
-                    NotificationChannel.wallpaperUpdates,
-                    'Wallpaper Changed',
-                    'Wallpaper has been set to ${widget.apod.title}');
-              }).catchError((_) {
-                sendNotification(
-                    NotificationChannel.wallpaperUpdates,
-                    'Cannot Set Wallpaper',
-                    'There has been an error while setting your wallpaper. Please try again later.');
-                setState(() {
-                  doneWithError = true;
-                });
-              }).whenComplete(() {
-                setState(() {
-                  done = true;
-                });
-
-                Navigator.pop(context);
-              });
+              if (wallpaperLocation != null) {
+                _changeWallpaper(wallpaperLocation);
+              }
             }
           : null,
       child: _buildButtonState(context),
     );
+  }
+
+  void _changeWallpaper(int wallpaperLocation) {
+    double screenRatio = getScreenRatio(context);
+
+    showDialog(
+        context: context, child: loadingDialog, barrierDismissible: false);
+
+    changeWallpaper(widget.apod, screenRatio, wallpaperLocation).then((_) {
+      AppStorage.setDynamicWallpaper(false, screenRatio);
+      sendNotification(
+          NotificationChannel.wallpaperUpdates,
+          'Wallpaper Changed',
+          'Wallpaper has been set to ${widget.apod.title}');
+    }).catchError((_) {
+      sendNotification(
+          NotificationChannel.wallpaperUpdates,
+          'Cannot Set Wallpaper',
+          'There has been an error while setting your wallpaper. Please try again later.');
+      setState(() {
+        doneWithError = true;
+      });
+    }).whenComplete(() {
+      setState(() {
+        done = true;
+      });
+
+      Navigator.pop(context);
+    });
   }
 
   Widget _buildButtonState(BuildContext context) {
@@ -139,7 +170,7 @@ class _SetWallpaperConfirmButtonState extends State<SetWallpaperConfirmButton> {
       return Text('OK');
     }
 
-    Future.delayed(Duration(milliseconds: 3000)).then((_) {
+    Future.delayed(Duration(milliseconds: 1500)).then((_) {
       Navigator.pop(context);
     });
 

@@ -13,7 +13,7 @@ final AlertDialog _dialogNoInternet = AlertDialog(
   title: Text('Failed to connect to NASA'),
   content: Text('Please check your internet connection then try again.'),
   actions: [
-    FlatButton(
+    TextButton(
       child: Text('EXIT'),
       onPressed: () => SystemNavigator.pop(),
     )

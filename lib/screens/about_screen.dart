@@ -36,8 +36,7 @@ class AboutScreen extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text('Liked it? Consider giving a', style: footerStyle),
-        FlatButton(
-          padding: EdgeInsets.symmetric(horizontal: 8),
+        TextButton(
           onPressed: () => launchUrl(context, githubRepoUrl),
           child: Row(
             mainAxisSize: MainAxisSize.min,

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/apod_model.dart';
 import 'package:nasa_apod/models/app_storage.dart';
@@ -9,6 +8,7 @@ import 'package:nasa_apod/screens/recents_screen.dart';
 import 'package:nasa_apod/theme/theme.dart';
 import 'package:nasa_apod/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:wallpaper_manager/wallpaper_manager.dart';
 
 import 'detail_screen.dart';
 import 'favorites_screen.dart';
@@ -48,7 +48,7 @@ class _DailyWallpaperSettingState extends State<DailyWallpaperSetting> {
           child: AlertDialog(
             title: Text('Enable Daily Wallpaper?'),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context, false);
                 },
@@ -128,6 +128,85 @@ class _UseHDForDownloadsSettingState extends State<UseHDForDownloadsSetting> {
           : null,
       title: Text('HD Wallpapers'),
       subtitle: Text('Uses more data'),
+    );
+  }
+}
+
+class DailyWallpaperLocationSetting extends StatefulWidget {
+  @override
+  _DailyWallpaperLocationSettingState createState() =>
+      _DailyWallpaperLocationSettingState();
+}
+
+class _DailyWallpaperLocationSettingState
+    extends State<DailyWallpaperLocationSetting> {
+  int _value = WallpaperManager.HOME_SCREEN;
+  bool _enabled = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initValue();
+  }
+
+  void initValue() async {
+    _value = await AppStorage.getDailyWallpaperLocation();
+    setState(() {
+      _enabled = true;
+    });
+  }
+
+  void _onChanged(int newValue) {
+    try {
+      AppStorage.setDailyWallpaperLocation(newValue);
+      String location = 'to ';
+      switch (newValue) {
+        case WallpaperManager.HOME_SCREEN:
+          location += 'home screen';
+          break;
+        case WallpaperManager.LOCK_SCREEN:
+          location += 'lock screen';
+          break;
+        case WallpaperManager.BOTH_SCREENS:
+          location += 'both home and lock screens';
+          break;
+        default:
+          location = '';
+      }
+      showSnackbar(context, 'Daily wallpapers location is updated $location.');
+      setState(() {
+        _value = newValue;
+      });
+    } catch (err) {
+      showSnackbar(context, 'Error in changing daily wallpaper location.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton(
+          onChanged: (_enabled) ? _onChanged : null,
+          value: _value,
+          items: [
+            DropdownMenuItem(
+              child: Text('Home Screen'),
+              value: WallpaperManager.HOME_SCREEN,
+            ),
+            DropdownMenuItem(
+              child: Text('Lock Screen'),
+              value: WallpaperManager.LOCK_SCREEN,
+            ),
+            DropdownMenuItem(
+              child: Text('Both Screen'),
+              value: WallpaperManager.BOTH_SCREENS,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -221,6 +300,11 @@ class _AppScaffoldState extends State<AppScaffold> {
               key: ValueKey('dailyWallpaperSetting'),
             ),
             UseHDForDownloadsSetting(),
+            DrawerSectionTitle(
+              'Daily Wallpaper Location',
+              noDivider: true,
+            ),
+            DailyWallpaperLocationSetting(),
             DrawerSectionTitle('Other'),
             ListTile(
               leading: Icon(Icons.info),
@@ -280,8 +364,9 @@ class _AppScaffoldState extends State<AppScaffold> {
 
 class DrawerSectionTitle extends StatelessWidget {
   final String title;
+  final bool noDivider;
 
-  DrawerSectionTitle(this.title);
+  DrawerSectionTitle(this.title, {this.noDivider = false});
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +374,7 @@ class DrawerSectionTitle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16, top: 16),
+          padding: const EdgeInsets.only(left: 16, top: 8),
           child: Text(
             title,
             style: appTheme.textTheme.subtitle2.copyWith(
@@ -297,7 +382,7 @@ class DrawerSectionTitle extends StatelessWidget {
             ),
           ),
         ),
-        Divider(),
+        if (!noDivider) Divider(),
       ],
     );
   }
