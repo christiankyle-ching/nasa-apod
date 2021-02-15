@@ -36,7 +36,7 @@ Future<dynamic> selectNotification(String payload) async {
 Future onDidReceiveLocalNotification(
     int id, String title, String body, String payload) async {
   /* 
-  TODO: implement this
+  TODO: Not Implemented iOS
   Will be called when notification is called on foreground
   By default, IOS won't send notification when app is in use
   Handle by showing dialog instead, or not at all.

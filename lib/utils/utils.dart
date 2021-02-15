@@ -97,7 +97,7 @@ class _ImagePreview extends StatelessWidget {
       },
       fit: BoxFit.cover,
       errorBuilder: (_, error, stackTrace) {
-        showSnackbar(context, 'An error occured while loading image');
+        // showSnackbar(context, 'An error occured while loading image');
         return Container();
       },
     );
