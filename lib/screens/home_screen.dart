@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:nasa_apod/models/api.dart';
 import 'package:nasa_apod/models/apod_model.dart';
@@ -10,6 +11,7 @@ import 'package:nasa_apod/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:wallpaper_manager/wallpaper_manager.dart';
 
+import '../ad_manager.dart';
 import 'detail_screen.dart';
 import 'favorites_screen.dart';
 
@@ -228,9 +230,68 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   Future<Apod> _futureHighlightApod;
 
+  // InterstitialAd
+  InterstitialAd _interstitialAd;
+  bool _isInterstitialAdReady;
+
+  void _initInterstitialAd() {
+    _isInterstitialAdReady = false;
+
+    _interstitialAd = InterstitialAd(
+      adUnitId: AdManager.interstitialAdUnitId,
+      listener: _onInterstitialAdEvent,
+    );
+  }
+
+  void _loadInterstitialAd() {
+    _interstitialAd.load();
+  }
+
+  void _onInterstitialAdEvent(MobileAdEvent event) {
+    switch (event) {
+      case MobileAdEvent.loaded:
+        _isInterstitialAdReady = true;
+        break;
+      case MobileAdEvent.failedToLoad:
+        _isInterstitialAdReady = false;
+        print('Failed to load an interstitial ad');
+        break;
+      case MobileAdEvent.closed:
+        // _loadInterstitialAd();
+        // _isInterstitialAdReady = false;
+        break;
+      default:
+      // do nothing
+    }
+  }
+
+  // BannerAd
+  BannerAd _bannerAd;
+
+  void _initBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.banner,
+    );
+
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd
+      ..load()
+      ..show(anchorType: AnchorType.bottom);
+  }
+
   @override
   void initState() {
     super.initState();
+
+    // TODO: Interstitial Ads - can be activated in the future
+    _initInterstitialAd();
+    // _loadInterstitialAd();
+
+    _initBannerAd();
 
     // Init Pages
     try {
@@ -256,6 +317,8 @@ class _AppScaffoldState extends State<AppScaffold> {
   }
 
   void _onItemTapped(int index) {
+    if (_isInterstitialAdReady) _interstitialAd.show();
+
     setState(() {
       _currentTab = index;
     });
@@ -358,6 +421,14 @@ class _AppScaffoldState extends State<AppScaffold> {
         onTap: _onItemTapped,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd.dispose();
+    _bannerAd.dispose();
+
+    super.dispose();
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:nasa_apod/screens/media_screen.dart';
 import 'package:nasa_apod/tasks/notifications.dart';
 import 'package:nasa_apod/tasks/tasks.dart';
 import 'package:nasa_apod/theme/theme.dart';
+import 'package:nasa_apod/ad_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,6 +26,8 @@ void main() {
 
   initializeBackgroundTasks();
   initializeNotifications();
+
+  _initAdMob();
 
   runApp(ChangeNotifierProvider(
       create: (context) => ApodModel(), child: MainApp()));
@@ -47,6 +50,10 @@ class MainApp extends StatelessWidget {
       ],
     );
   }
+}
+
+Future<void> _initAdMob() {
+  return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
 }
 
 // DEBUG: Generate mock values
