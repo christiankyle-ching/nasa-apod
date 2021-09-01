@@ -93,33 +93,66 @@ Future<void> changeWallpaper(
         (await AppStorage.getHdSetting()) ? apod.hdurl : apod.url;
     String fileDir = await cacheImage(downloadUrl, WALLPAPER_CACHE_FILENAME);
 
-    // Crop image
+    /**
+     * Crop Image
+     * 
+     * Notes: Current bug on wallpaper_manager when device is in landscape.
+     */
+
+    // Get File
     File imageFile = File(fileDir);
     var decodedImage = await decodeImageFromList(imageFile.readAsBytesSync());
 
-    int widthMid = (decodedImage.width / 2).floor();
-    int widthOffset = ((decodedImage.height * screenRatio) / 2).floor();
+    bool isImageLandscape = decodedImage.width >=
+        decodedImage.height; // Note: Same logic when image is square, hence >=
 
-    int top = 0;
-    int bottom = decodedImage.height;
-    int left = widthMid - widthOffset;
-    int right = widthMid + widthOffset;
+    // Different logic based on downloaded image orientation to prevent exceeding max values of crop
+    int top, bottom, left, right;
 
-    // DEBUG
-    print('Screen Ratio: $screenRatio');
-    print('Image Height: ${decodedImage.height}');
-    print('Image Width: ${decodedImage.width}');
-    print('Image Middle: $widthMid');
-    print('Top: $top');
-    print('Bottom: $bottom');
-    print('Left: $left');
-    print('Right: $right');
+    if (isImageLandscape) {
+      // Get Width Midpoint of image
+      int widthMid = (decodedImage.width / 2).floor();
+      // Offset from center of image in x (width)
+      int widthOffset = ((decodedImage.height * screenRatio) / 2).floor();
 
-    print(imageFile);
+      // Use max of height
+      top = 0;
+      bottom = decodedImage.height;
+      // Then adjust width to adapt screen ratio
+      left = widthMid - widthOffset;
+      right = widthMid + widthOffset;
+    } else {
+      // Get Height Midpoint of image
+      int heightMid = (decodedImage.height / 2).floor();
+      // Offset from center of image in x (width)
+      int heightOffset = ((decodedImage.width * screenRatio) / 2).floor();
 
-    // Set Wallpaper
-    await WallpaperManager.setWallpaperFromFileWithCrop(
-        fileDir, wallpaperLocation, left, top, right, bottom);
+      // Use max of width
+      left = 0;
+      right = decodedImage.width;
+      // Then adjust height to adapt screen ratio
+      top = heightMid - heightOffset;
+      bottom = heightMid + heightOffset;
+    }
+
+    /* DEBUG */
+    // print('Screen Ratio: $screenRatio');
+    // print('Image in Landscape: $isImageLandscape');
+    // print('Image Width: ${decodedImage.width}');
+    // print('Image Height: ${decodedImage.height}');
+    // print('Top: $top');
+    // print('Bottom: $bottom');
+    // print('Left: $left');
+    // print('Right: $right');
+    // print(imageFile);
+
+    // Set Wallpaper, crop if supplied with values
+    if (left != null && top != null && right != null && bottom != null) {
+      await WallpaperManager.setWallpaperFromFileWithCrop(
+          fileDir, wallpaperLocation, left, top, right, bottom);
+    } else {
+      await WallpaperManager.setWallpaperFromFile(fileDir, wallpaperLocation);
+    }
   } catch (_) {
     rethrow;
   }

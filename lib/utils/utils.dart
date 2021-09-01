@@ -60,8 +60,20 @@ bool isDateWithinRange(DateTimeRange range, DateTime date) {
 }
 
 double getScreenRatio(BuildContext context) {
-  return MediaQuery.of(context).size.width.floor() /
-      MediaQuery.of(context).size.height.floor();
+  int screenWidth = MediaQuery.of(context).size.width.floor();
+  int screenHeight = MediaQuery.of(context).size.height.floor();
+
+  /**
+   * FIXME: Better logic
+   * 
+   * Note: Screen Ratio = Width / Height
+   * 
+   * If screen is in landscape, flip calculation
+   * Screen ratio is always calculated by portrait to ensure phone compatability
+   */
+  return (screenWidth > screenHeight)
+      ? screenHeight / screenWidth
+      : screenWidth / screenHeight;
 }
 
 // Widgets
